@@ -2,11 +2,11 @@
 
 # Gestor de Productos y Usuarios
 
-Este proyecto implementa las clases `GestorProductos` y `GestorUsuarios` para gestionar conjuntos de productos y usuarios.
+Este proyecto implementa las clases `products.fs` y `users.fs` para gestionar conjuntos de productos y usuarios.
 
 ## Clases
 
-### `GestorProductos`
+### `products.fs`
 
 #### Métodos
 
@@ -14,7 +14,7 @@ Este proyecto implementa las clases `GestorProductos` y `GestorUsuarios` para ge
 - `leer()`: Devuelve el arreglo con todos los productos.
 - `leerUno(id)`: Devuelve el objeto producto buscado por su `id`.
 
-### `GestorUsuarios`
+### `users.fs`
 
 #### Métodos
 
