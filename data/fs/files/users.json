@@ -7,8 +7,8 @@
   },
   {
     "id": 2,
-    "nombre": "Usuario 1",
+    "nombre": "Usuario 2",  
     "foto": "https://cdn.pixabay.com/photo/2012/04/13/21/07/user-33638_1280.png",
-    "correo": "usuario1@example.com"
+    "correo": "usuario2@example.com"  
   }
 ]
