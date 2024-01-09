@@ -1,54 +1,28 @@
 const express = require('express');
-const ProductsManager = require('./data/fs/files/products.fs');
-const UsersManager = require('./data/fs/files/users.fs');
+const morgan = require('morgan');
+const pathNotFoundHandler = require('./src/middlewares/pathNotFoundHandler');
+const errorHandler = require('./src/middlewares/errorHandler');
+const productsRouter = require('./src/routers/productsRouter');
+const usersRouter = require('./src/routers/usersRouter');
+const ordersRouter = require('./src/routers/ordersRouter');
 
 const app = express();
 const port = 8080;
 
-const productsManager = new ProductsManager();
-const usersManager = new UsersManager();
-
+// Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(morgan('dev'));
 
-// Endpoints de productos
-app.get('/api/products', (req, res) => {
-  const result = productsManager.read();
-  if (result.length > 0) {
-    return res.json({ success: true, response: result });
-  } else {
-    return res.status(404).json({ success: false, message: 'not found!' });
-  }
-});
+// Rutas
+app.use('/api/products', productsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/orders', ordersRouter);
 
-app.get('/api/products/:pid', (req, res) => {
-  const { pid } = req.params;
-  const result = productsManager.readOne(pid);
-  if (result) {
-    return res.json({ success: true, response: result });
-  } else {
-    return res.status(404).json({ success: false, message: 'not found!' });
-  }
-});
-
-// Endpoints de usuarios
-app.get('/api/users', (req, res) => {
-  const result = usersManager.read();
-  if (result.length > 0) {
-    return res.json({ success: true, response: result });
-  } else {
-    return res.status(404).json({ success: false, message: 'not found!' });
-  }
-});
-
-app.get('/api/users/:uid', (req, res) => {
-  const { uid } = req.params;
-  const result = usersManager.readOne(uid);
-  if (result) {
-    return res.json({ success: true, response: result });
-  } else {
-    return res.status(404).json({ success: false, message: 'not found!' });
-  }
-});
+// Middlewares para manejar rutas no encontradas y errores
+app.use(pathNotFoundHandler);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
