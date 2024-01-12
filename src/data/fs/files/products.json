@@ -1,142 +1,23 @@
 [
   {
-    "id": 1,
-    "titulo": "Ramen de Naruto",
-    "foto": "https://i.imgur.com/76HP0Mk.gif",
-    "precio": 2000,
-    "stock": 50
+    "id": "5b55316e4b171d2f26c2ebb0",
+    "title": "tablet samsung",
+    "photo": "https://picsum.photos/200",
+    "stock": 5,
+    "price": 3000
   },
   {
-    "id": 2,
-    "titulo": "Poción de Sakura",
-    "foto": "",
-    "precio": 5000,
-    "stock": 30
-  },
-  {
-    "id": 3,
-    "titulo": "Zanpakuto de Ichigo",
-    "foto": "",
-    "precio": 10000,
-    "stock": 20
-  },
-  {
-    "id": 4,
-    "titulo": "Byakugan de Hinata",
-    "foto": "",
-    "precio": 8000,
-    "stock": 25
-  },
-  {
-    "id": 5,
-    "titulo": "Geass de Lelouch",
-    "foto": "",
-    "precio": 15000,
-    "stock": 15
-  },
-  {
-    "id": 6,
-    "titulo": "EVA Unit de Asuka",
-    "foto": "",
-    "precio": 25000,
+    "id": "ca82151d5832d32f2b6dfc62",
+    "title": "laptop",
+    "photo": "https://picsum.photos/200",
+    "price": 100,
     "stock": 10
   },
   {
-    "id": 7,
-    "titulo": "Saiyan Capsule de Goku",
-    "foto": "",
-    "precio": 9000,
-    "stock": 30
-  },
-  {
-    "id": 8,
-    "titulo": "Scouter de Vegeta",
-    "foto": "",
-    "precio": 12000,
-    "stock": 25
-  },
-  {
-    "id": 9,
-    "titulo": "Log Pose de Nami",
-    "foto": "",
-    "precio": 6000,
-    "stock": 40
-  },
-  {
-    "id": 10,
-    "titulo": "Gomu Gomu no Mi de Luffy",
-    "foto": "",
-    "precio": 18000,
-    "stock": 20
-  },
-  {
-    "id": 11,
-    "titulo": "Sharingan de Sasuke",
-    "foto": "",
-    "precio": 10000,
-    "stock": 15
-  },
-  {
-    "id": 12,
-    "titulo": "Moon Tiara de Sailor Moon",
-    "foto": "",
-    "precio": 12000,
-    "stock": 25
-  },
-  {
-    "id": 13,
-    "titulo": "Tessaiga de Inuyasha",
-    "foto": "",
-    "precio": 8000,
-    "stock": 20
-  },
-  {
-    "id": 14,
-    "titulo": "Sacred Jewel de Kagome",
-    "foto": "",
-    "precio": 6000,
-    "stock": 30
-  },
-  {
-    "id": 15,
-    "titulo": "Philosopher's Stone de Edward",
-    "foto": "",
-    "precio": 15000,
-    "stock": 15
-  },
-  {
-    "id": 16,
-    "titulo": "Automail de Winry",
-    "foto": "",
-    "precio": 7000,
-    "stock": 25
-  },
-  {
-    "id": 17,
-    "titulo": "Dragon Slayer de Natsu",
-    "foto": "",
-    "precio": 12000,
-    "stock": 20
-  },
-  {
-    "id": 18,
-    "titulo": "Celestial Spirit Key de Lucy",
-    "foto": "",
-    "precio": 8000,
-    "stock": 30
-  },
-  {
-    "id": 19,
-    "titulo": "Fishing Rod de Gon",
-    "foto": "",
-    "precio": 5000,
-    "stock": 40
-  },
-  {
-    "id": 20,
-    "titulo": "Yo-yo de Killua",
-    "foto": "",
-    "precio": 6000,
-    "stock": 35
+    "id": "6d4ee0a456e11436274c8a20",
+    "title": "tv",
+    "photo": "https://picsum.photos/200",
+    "price": 100,
+    "stock": 10
   }
 ]

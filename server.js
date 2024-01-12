@@ -1,29 +1,23 @@
-const express = require('express');
-const morgan = require('morgan');
-const pathNotFoundHandler = require('./src/middlewares/pathNotFoundHandler');
-const errorHandler = require('./src/middlewares/errorHandler');
-const productsRouter = require('./src/routers/productsRouter');
-const usersRouter = require('./src/routers/usersRouter');
-const ordersRouter = require('./src/routers/ordersRouter');
+import express from 'express'
+import router from './src/routers/index.router.js'
+import errorHandler from "./src/middlewares/errorHandler.js";
+import pathHandler from "./src/middlewares/pathHandler.js";
+import __dirname from "./utils.js";
+import morgan from "morgan";
 
-const app = express();
-const port = 8080;
+const server=express()
+const PORT=8080
+const ready = ()=>{
+    console.log(`Server ready on port ${PORT}`)
+}
 
-// Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
-app.use(morgan('dev'));
+//middle
+server.use(express.json())
+server.use(express.urlencoded({extended:true}))
+server.use(express.static(__dirname+"/public"))
+server.use(morgan("dev")) 
+server.use("/",router)
+server.use(errorHandler)
+server.use(pathHandler)
 
-// Rutas
-app.use('/api/products', productsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/orders', ordersRouter);
-
-// Middlewares para manejar rutas no encontradas y errores
-app.use(pathNotFoundHandler);
-app.use(errorHandler);
-
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+server.listen(PORT,ready)
