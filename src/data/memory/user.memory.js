@@ -104,4 +104,3 @@ const Manager = new UserManager();
 console.log(Manager.create({ photo: "https://picsum.photos/200", email: "jH6Qm@example.com"}));
 Manager.create({name: "Roman", photo: "https://picsum.photos/200", email: "jH6Qm@example.com"});
 console.log(Manager.read());
-/* Manager.readOne(3); */
