@@ -1,4 +1,4 @@
-import { model, Schema } from "moongose";
+import { model, Schema } from "mongoose";
 
 const collection = "users";
 const schema = new Schema(

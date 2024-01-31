@@ -1,6 +1,6 @@
-import UserModel from './mongo/models/user.model.js';
-import OrderModel from './mongo/models/order.model.js';
-import ProductModel from './mongo/models/product.model.js';
+import UserModel from './models/user.model.js';
+import OrderModel from './models/order.model.js';
+import ProductModel from './models/product.model.js';
 
 class MongoManager {
     constructor(model) {

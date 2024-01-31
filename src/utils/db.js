@@ -2,7 +2,7 @@ import { connect } from "mongoose";
 
 const dbConnection = async () => {
   try {
-    const uri = "mongodb+srv://julianbati92:Juli1992!@cluster0.z3igizd.mongodb.net/";
+    const uri = process.env.MONGO_URI;
     await connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log("Database connected");
   } catch (error) {
