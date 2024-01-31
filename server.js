@@ -1,13 +1,14 @@
+import "dotenv/config.js";
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import dbConnection from "./src/utils/db.js";
 import router from './src/routers/index.router.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import morgan from 'morgan';
 import exphbs from 'express-handlebars';
-import fs from 'fs';
-import path from 'path'; 
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,7 +20,8 @@ const io = new Server(server);
 const PORT = 8080;
 
 const ready = () => {
-    console.log(`Server ready on port ${PORT}`);
+    console.log("server ready on port " + PORT);
+    dbConnection();
 };
 
 // Middleware
@@ -33,7 +35,7 @@ const hbs = exphbs.create({ extname: '.handlebars' });
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src/views'));
-app.use('/', router);  
+app.use('/', router);
 
 // Configuración de WebSockets
 io.on('connection', (socket) => {
