@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 const hbs = require('express-handlebars');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const { connectToMongo } = require('./db');
 const { Product } = require('./manager.mongo'); 
 const { report } = require('./manager.mongo'); 
@@ -22,6 +24,17 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware de sesiones
+app.use(session({
+    secret: '1234', // Cambia esto con una clave segura, actualmente 1234
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie de sesión en milisegundos, se configuro 1 dia
+    },
+}));
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
