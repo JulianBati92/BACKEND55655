@@ -1,67 +1,95 @@
-import UserModel from './models/user.model.js';
-import OrderModel from './models/order.model.js';
-import ProductModel from './models/product.model.js';
+const { MongoClient, ObjectId } = require('mongodb');
+require('dotenv').config();
 
 class MongoManager {
-    constructor(model) {
-        this.model = model;
-    }
+  constructor(collectionName) {
+    this.url = process.env.MONGO_URL;
+    this.dbName = process.env.MONGO_DB_NAME;
+    this.collectionName = collectionName;
+    this.client = null; 
+  }
 
-    async create(data) {
-        try {
-            const newItem = await this.model.create(data);
-            return newItem;
-        } catch (error) {
-            throw error;
-        }
+  async connect() {
+    try {
+      this.client = new MongoClient(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
+      await this.client.connect();
+      this.db = this.client.db(this.dbName);
+      this.collection = this.db.collection(this.collectionName);
+    } catch (error) {
+      console.error(`MongoDB connection error: ${error.message}`);
+      throw new Error('Unable to connect to the database');
     }
+  }
 
-    async read(options = {}) {
-        try {
-            const result = await this.model.find(options.filter).sort(options.sort);
-            return result;
-        } catch (error) {
-            throw error;
-        }
+  async close() {
+    if (this.client) {
+      await this.client.close();
+      console.log('MongoDB connection closed');
     }
+  }
 
-    async readOne(itemId) {
-        try {
-            const item = await this.model.findById(itemId);
-            return item;
-        } catch (error) {
-            throw error;
-        }
+  async create(data) {
+    try {
+      await this.connect();
+      const result = await this.collection.insertOne(data);
+      return result.ops[0];
+    } finally {
+      await this.close();
     }
+  }
 
-    async update(itemId, data) {
-        try {
-            const updatedItem = await this.model.findByIdAndUpdate(itemId, data, { new: true });
-            return updatedItem;
-        } catch (error) {
-            throw error;
-        }
+  async read({ filter, sortAndPaginate }) {
+    try {
+      await this.connect();
+      const query = {};
+      if (filter) query.filter = filter;
+      const cursor = this.collection.find(query).sort(sortAndPaginate).limit(sortAndPaginate.limit).skip(sortAndPaginate.skip);
+      return cursor.toArray();
+    } finally {
+      await this.close();
     }
+  }
 
-    async destroy(itemId) {
-        try {
-            const deletedItem = await this.model.findByIdAndDelete(itemId);
-            return deletedItem;
-        } catch (error) {
-            throw error;
-        }
+  async readOne(id) {
+    try {
+      await this.connect();
+      const result = await this.collection.findOne({ _id: new ObjectId(id) });
+      return result;
+    } finally {
+      await this.close();
     }
+  }
 
-    async readByEmail(email) {
-        try {
-            const item = await this.model.findOne({ email });
-            return item;
-        } catch (error) {
-            throw error;
-        }
+  async update(id, data) {
+    try {
+      await this.connect();
+      await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
+    } finally {
+      await this.close();
     }
+  }
+
+  async destroy(id) {
+    try {
+      await this.connect();
+      await this.collection.deleteOne({ _id: new ObjectId(id) });
+    } finally {
+      await this.close();
+    }
+  }
+
+  async report(uid) {
+    try {
+      await this.connect();
+      const userOrders = await this.collection.find({ userId: uid }).toArray();
+
+      const totalToPay = userOrders.reduce((total, order) => total + order.total, 0);
+
+      return totalToPay;
+    } finally {
+      await this.close();
+    }
+  }
 }
 
-export const UserManager = new MongoManager(UserModel);
-export const OrderManager = new MongoManager(OrderModel);
-export const ProductManager = new MongoManager(ProductModel);
+module.exports = MongoManager;

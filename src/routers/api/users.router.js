@@ -1,100 +1,59 @@
-import { Router } from "express";
-import { UserManager } from "../../data/mongo/manager.mongo.js"; // Actualiza la importación del manager
-import propsUser from "../../middlewares/propsUser.js";
-const usersRouter = Router();
+const express = require("express");
+const router = express.Router();
+const { UserManager } = require("./manager.mongo");
 
-usersRouter.post("/", propsUser, async (req, res, next) => {
-    try {
-        const data = req.body;
-        const response = await UserManager.create(data); // Utiliza el manager de usuarios
-
-        return res.json({
-            statusCode: 201,
-            response,
-        });
-    } catch (error) {
-        return next(error);
-    }
+router.post("/", async (req, res) => {
+  try {
+    await UserManager.create(req.body);
+    res.status(201).json({ message: "User created successfully" });
+  } catch (error) {
+    console.error(`Error creating user: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-usersRouter.get('/', async (req, res, next) => {
-    try {
-        const users = await UserManager.read(); // Utiliza el manager de usuarios
-        if (users) {
-            return res.json({
-                statusCode: 200,
-                response: users,
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!",
-            });
-        }
-    } catch (error) {
-        return next(error);
-    }
+router.get("/", async (req, res) => {
+  try {
+    const users = await UserManager.read({});
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(`Error fetching users: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-usersRouter.get('/:uid', async (req, res, next) => {
-    try {
-        const { uid } = req.params;
-        const user = await UserManager.readOne(uid); // Utiliza el manager de usuarios
-        if (user) {
-            return res.json({
-                statusCode: 200,
-                response: user,
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!",
-            });
-        }
-    } catch (error) {
-        return next(error);
+router.get("/:uid", async (req, res) => {
+  try {
+    const user = await UserManager.readOne(req.params.uid);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (error) {
+    console.error(`Error fetching user: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-usersRouter.put('/:uid', async (req, res, next) => {
-    try {
-        const { uid } = req.params;
-        const data = req.body;
-        const user = await UserManager.update(uid, data); // Utiliza el manager de usuarios
-        if (user) {
-            return res.json({
-                statusCode: 200,
-                response: user,
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!",
-            });
-        }
-    } catch (error) {
-        return next(error);
-    }
+router.put("/:uid", async (req, res) => {
+  try {
+    await UserManager.update(req.params.uid, req.body);
+    res.status(200).json({ message: "User updated successfully" });
+  } catch (error) {
+    console.error(`Error updating user: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-usersRouter.delete('/:uid', async (req, res, next) => {
-    try {
-        const { uid } = req.params;
-        const user = await UserManager.destroy(uid); // Utiliza el manager de usuarios
-        if (user) {
-            return res.json({
-                statusCode: 200,
-                response: user,
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!",
-            });
-        }
-    } catch (error) {
-        return next(error);
-    }
+router.delete("/:uid", async (req, res) => {
+  try {
+    await UserManager.destroy(req.params.uid);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error(`Error deleting user: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-export default usersRouter;
+module.exports = router;

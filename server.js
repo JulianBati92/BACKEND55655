@@ -1,80 +1,120 @@
-import "dotenv/config.js";
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import dbConnection from "./src/utils/db.js";
-import router from './src/routers/index.router.js';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import morgan from 'morgan';
-import exphbs from 'express-handlebars';
-import path from 'path';
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const path = require('path');
+const dotenv = require('dotenv');
+const hbs = require('express-handlebars');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const { connectToMongo } = require('./db');
+const { Product } = require('./manager.mongo'); 
+const { report } = require('./manager.mongo'); 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const PORT = process.env.PORT || 8080;
 
-const PORT = 8080;
-
-const ready = () => {
-    console.log("server ready on port " + PORT);
-    dbConnection();
-};
+// Configuración del motor de plantillas Handlebars
+app.engine('handlebars', hbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración de Handlebars
-const hbs = exphbs.create({ extname: '.handlebars' });
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'src/views'));
-app.use('/', router);
+// Middleware de sesiones
+app.use(session({
+    secret: '1234', // Cambia esto con una clave segura, actualmente 1234
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie de sesión en milisegundos, se configuro 1 dia
+    },
+}));
 
-// Configuración de WebSockets
-io.on('connection', (socket) => {
-    console.log('New connection:', socket.id);
+// Conexión a MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
 
-    // Emitir productos al cliente
-    socket.emit('products', getAllProducts());
-
-    // Recepción de nuevo producto desde el formulario
-    socket.on('new product', (newProduct) => {
-        saveProduct(newProduct);
-        // Emitir todos los productos actualizados al cliente
-        io.emit('products', getAllProducts());
-    });
+app.post('/api/products', async (req, res, next) => {
+    try {
+        const product = await Product.create(req.body);
+        res.json(product);
+    } catch (error) {
+        next(error);
+    }
 });
 
-// Funciones para manejar productos (móvelas fuera del archivo server.js si es posible)
-const productsFilePath = __dirname + '/src/data/products.json';
-
-function getAllProducts() {
+app.get('/api/products', async (req, res, next) => {
     try {
-        const productsData = fs.readFileSync(productsFilePath, 'utf-8');
-        return JSON.parse(productsData);
+        const { filter, sortAndPaginate } = req.query;
+        const products = await Product.read({ filter, sortAndPaginate });
+        res.json(products);
     } catch (error) {
-        console.error('Error reading products file:', error.message);
-        return [];
+        next(error);
     }
-}
+});
 
-function saveProduct(newProduct) {
-    const currentProducts = getAllProducts();
-    currentProducts.push(newProduct);
-
+app.get('/api/products/:pid', async (req, res, next) => {
     try {
-        fs.writeFileSync(productsFilePath, JSON.stringify(currentProducts, null, 2));
-        console.log('Product saved successfully:', newProduct);
+        const product = await Product.readOne(req.params.pid);
+        res.json(product);
     } catch (error) {
-        console.error('Error writing products file:', error.message);
+        next(error);
     }
-}
+});
 
-server.listen(PORT, ready);
+app.put('/api/products/:pid', async (req, res, next) => {
+    try {
+        const updatedProduct = await Product.update(req.params.pid, req.body);
+        res.json(updatedProduct);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.delete('/api/products/:pid', async (req, res, next) => {
+    try {
+        await Product.destroy(req.params.pid);
+        res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get('/api/orders/total/:uid', async (req, res, next) => {
+    try {
+        const totalAmount = await report(req.params.uid);
+        res.json({ totalAmount });
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+app.get('/', async (req, res, next) => {
+    try {
+        const products = await Product.find();
+
+        res.render('home', { products });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Manejadores de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+connectToMongo();

@@ -2,11 +2,10 @@ import { connect } from "mongoose";
 
 const dbConnection = async () => {
   try {
-    const uri = process.env.MONGO_URI;
-    await connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log("Database connected");
+    await connect(process.env.DB_LINK);
+    console.log("Conectado a la base de datos");
   } catch (error) {
-    console.error("Error connecting to the database:", error);
+    console.log(error);
   }
 };
 
