@@ -1,105 +1,30 @@
 import { Router } from "express";
+import ensureAuthenticated from "../../middlewares/ensureAuthenticated.js";
 import { OrderManager } from "../../data/mongo/manager.mongo.js";
-import propsOrder from "../../middlewares/propsOrders.js";
 
 const ordersRouter = Router();
 
-ordersRouter.post("/", propsOrder, async (req, res, next) => {
+// Obtener y mostrar órdenes del usuario autenticado
+ordersRouter.get("/", ensureAuthenticated, async (req, res, next) => {
     try {
-        const data = req.body;
-        const response = await OrderManager.create(data);
+        const userId = req.user._id; // Obtén el ID del usuario autenticado
 
-        return res.json({
-            statusCode: 201,
-            response,
-        });
-    } catch (error) {
-        return next(error);
-    }
-});
+        // Puedes utilizar userId para buscar órdenes específicas del usuario en la base de datos
+        const orders = await OrderManager.getOrdersByUserId(userId);
 
-ordersRouter.get('/', async (req, res, next) => {
-    try {
-        const orders = await OrderManager.read();
-        if (orders) {
-            return res.json({
+        if (orders.length > 0) {
+            res.json({
                 statusCode: 200,
-                response: orders
+                response: orders,
             });
         } else {
-            return res.json({
+            res.json({
                 statusCode: 404,
-                message: "Not found!"
+                message: "No se encontraron órdenes para este usuario.",
             });
         }
-
     } catch (error) {
-        return next(error);
-    }
-
-});
-
-ordersRouter.get('/:uid', async (req, res, next) => {
-    try {
-        const { uid } = req.params;
-        const order = await OrderManager.readOne(uid);
-        if (order) {
-            return res.json({
-                statusCode: 200,
-                response: order
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!"
-            });
-        }
-
-    } catch (error) {
-        return next(error);
-    }
-
-});
-
-ordersRouter.delete('/:oid', async (req, res, next) => {
-    try {
-        const { oid } = req.params;
-        const order = await OrderManager.destroy(oid);
-        if (order) {
-            return res.json({
-                statusCode: 200,
-                response: order
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!"
-            });
-        }
-
-    } catch (error) {
-        return next(error);
-    }
-});
-
-ordersRouter.put('/:oid/:quantity/:state', async (req, res, next) => {
-    try {
-        const { oid, quantity, state } = req.params;
-        const order = await OrderManager.update(oid, { quantity, state });
-        if (order) {
-            return res.json({
-                statusCode: 200,
-                response: order
-            });
-        } else {
-            return res.json({
-                statusCode: 404,
-                message: "Not found!"
-            });
-        }
-
-    } catch (error) {
-        return next(error);
+        next(error);
     }
 });
 

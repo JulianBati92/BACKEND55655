@@ -6,9 +6,12 @@ const dotenv = require('dotenv');
 const hbs = require('express-handlebars');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose'); 
+const passport = require('passport');
 const { connectToMongo } = require('./db');
 const { Product } = require('./manager.mongo'); 
 const { report } = require('./manager.mongo'); 
+const errorHandler = require('./middlewares/errorHandler');
 
 dotenv.config();
 
@@ -36,8 +39,12 @@ app.use(session({
     },
 }));
 
+// Inicialización de Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.DB_LINK, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
@@ -108,10 +115,7 @@ app.get('/', async (req, res, next) => {
 });
 
 // Manejadores de errores
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
