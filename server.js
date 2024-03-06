@@ -12,6 +12,7 @@ const { connectToMongo } = require('./db');
 const { Product } = require('./manager.mongo'); 
 const { report } = require('./manager.mongo'); 
 const errorHandler = require('./middlewares/errorHandler');
+const apiRouter = require('./routers/api.router');
 
 dotenv.config();
 
@@ -47,6 +48,9 @@ app.use(passport.session());
 mongoose.connect(process.env.DB_LINK, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
+
+// Rutas de la API
+app.use('/api', apiRouter);
 
 app.post('/api/products', async (req, res, next) => {
     try {
