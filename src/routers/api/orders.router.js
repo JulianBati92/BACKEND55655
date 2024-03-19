@@ -9,7 +9,7 @@ ordersRouter.get("/", ensureAuthenticated, async (req, res, next) => {
     try {
         const userId = req.user._id; // Obtén el ID del usuario autenticado
 
-        // Puedes utilizar userId para buscar órdenes específicas del usuario en la base de datos
+        // Utiliza userId para buscar órdenes específicas del usuario en la base de datos
         const orders = await OrderManager.getOrdersByUserId(userId);
 
         if (orders.length > 0) {
