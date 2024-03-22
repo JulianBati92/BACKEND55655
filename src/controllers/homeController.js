@@ -1,11 +1,12 @@
-const { Product } = require('../data/mongo/manager.mongo');
+const Product = require('../models/Product');
 
-exports.getHomePage = async (req, res, next) => {
+const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
-
-        res.render('home', { products, user: req.session.user });
+        const products = await Product.find({});
+        res.status(200).json(products);
     } catch (error) {
-        next(error);
+        res.status(500).json({ message: error.message });
     }
 };
+
+module.exports = { getAllProducts };

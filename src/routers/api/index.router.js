@@ -1,13 +1,11 @@
-import { Router } from "express";
-import usersRouter from "./users.router.js";
-import productsRouter from "./products.router.js";
-import ordersRouter from "./orders.router.js";
+import express from 'express';
+import authRouter from './auth.router.js';
+import viewsRouter from './views.router.js';
 
-const apiRouter = Router()
+const indexRouter = express.Router();
 
-//definir los enrutadores de los recursos
-apiRouter.use("/users",usersRouter)
-apiRouter.use("/products",productsRouter)
-apiRouter.use("/orders",ordersRouter)
+indexRouter.use('/api', apiRouter);
+indexRouter.use('/auth', authRouter);
+indexRouter.use('/views', viewsRouter);
 
-export default apiRouter
+export default indexRouter;

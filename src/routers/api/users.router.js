@@ -1,32 +1,8 @@
-import { Router } from "express";
-import passport from "passport";
-import { UserManager } from "../../data/mongo/manager.mongo.js";
-import propsUser from "../../middlewares/propsUser.js";
+const express = require('express');
+const userRouter = express.Router();
+const User = require('../models/User');
+const authController = require('../controllers/authController');
 
-const router = Router();
+userRouter.post('/register', authController.registerUser);
 
-router.post("/register", propsUser, async (req, res, next) => {
-    try {
-        await UserManager.create(req.body);
-        res.status(201).json({ message: "User created successfully" });
-    } catch (error) {
-        console.error(`Error creating user: ${error.message}`);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-router.post(
-    "/login",
-    passport.authenticate("local", {
-        successRedirect: "/",
-        failureRedirect: "/auth/login",
-        failureFlash: true,
-    })
-);
-
-router.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect("/");
-});
-
-export default router;
+module.exports = userRouter;

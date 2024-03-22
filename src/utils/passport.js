@@ -39,7 +39,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await UserManager.readOne(id);
+        const user = await UserManager.readOne({ _id: id }); // Corregido para buscar por _id
         done(null, user);
     } catch (error) {
         done(error, null);
