@@ -1,6 +1,6 @@
 import express from 'express';
-import authRouter from './auth.router.js';
-import viewsRouter from './views.router.js';
+import authRouter from './authRouter.js';
+import viewsRouter from './viewsRouter.js';
 
 const customRouter = express.Router();
 
