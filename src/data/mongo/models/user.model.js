@@ -9,7 +9,7 @@ const schema = new Schema(
     photo: { type: String, default: "/profile.png" },
     age: { type: Number, default: 18 },
   },
-  { timestramps: true }
+  { timestamps: true }
 );
 
 const User = model(collection, schema);
