@@ -10,21 +10,24 @@ import mongoose from "mongoose";
 import passport from "passport";
 import { CustomRouter } from "./src/routers/api/custom.router.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
-
+import passportConfig from "./src/utils/passport.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+//Configuracion de Handlebars
 app.engine("handlebars", hbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
+//Middlewares
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+//Configuracion de sesion
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "secret",
@@ -37,15 +40,21 @@ app.use(
     })
 );
 
+//Inicializacion de passport
 app.use(passport.initialize());
 app.use(passport.session());
+passportConfig(passport);
 
+// Conexión a la base de datos mongoDB
 mongoose.connect(process.env.DB_LINK, { useNewUrlParser: true, useUnifiedTopology: true });
 
+//Rutas
 app.use("/", CustomRouter);
 
+//Manejo de errores
 app.use(errorHandler);
 
+//Inicializacion del servidor
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
