@@ -1,7 +1,6 @@
 import Product from '../data/models/Product';
 
 class ProductService {
-  // Crea un nuevo producto en la base de datos
   async create(productData) {
     try {
       const product = await Product.create(productData);
@@ -11,7 +10,6 @@ class ProductService {
     }
   }
 
-  // Actualiza un producto existente en la base de datos
   async update(productId, productData) {
     try {
       const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
@@ -24,7 +22,6 @@ class ProductService {
     }
   }
 
-  // Elimina un producto existente de la base de datos
   async delete(productId) {
     try {
       const deletedProduct = await Product.findByIdAndDelete(productId);
@@ -37,7 +34,6 @@ class ProductService {
     }
   }
 
-  // Obtiene un producto por su ID de la base de datos
   async getById(productId) {
     try {
       const product = await Product.findById(productId);
@@ -50,7 +46,6 @@ class ProductService {
     }
   }
 
-  // Obtiene todos los productos de la base de datos
   async getAll() {
     try {
       const products = await Product.find();
@@ -60,7 +55,6 @@ class ProductService {
     }
   }
 
-  // Obtiene productos paginados de la base de datos
   async getProductsPaginated(pageNumber, pageSize) {
     try {
       const skip = (pageNumber - 1) * pageSize;
@@ -71,7 +65,6 @@ class ProductService {
     }
   }
 
-  // Obtiene el número total de productos en la base de datos
   async getProductCount() {
     try {
       const count = await Product.countDocuments();
@@ -81,7 +74,6 @@ class ProductService {
     }
   }
 
-  // Obtiene productos ordenados por precio en la base de datos
   async sortByPrice(order) {
     try {
       const sortOrder = order === 'asc' ? 1 : -1;
@@ -92,7 +84,6 @@ class ProductService {
     }
   }
 
-  // Busca productos por categoría en la base de datos
   async searchByCategory(category) {
     try {
       const products = await Product.find({ category });
@@ -102,7 +93,6 @@ class ProductService {
     }
   }
 
-  // Busca productos por etiqueta en la base de datos
   async searchByTag(tag) {
     try {
       const products = await Product.find({ tags: tag });
@@ -110,13 +100,6 @@ class ProductService {
     } catch (error) {
       throw new Error('Error al buscar productos por etiqueta');
     }
-  }
-
-  // Obtiene productos paginados de la base de datos
-  async getProductsPaginated(pageNumber, pageSize) {
-    const skip = (pageNumber - 1) * pageSize;
-    const products = await Product.find().skip(skip).limit(pageSize);
-    return products;
   }
 }
 
