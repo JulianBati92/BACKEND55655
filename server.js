@@ -12,7 +12,6 @@ import { CustomRouter } from "./src/routers/api/custom.router.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 import passportConfig from "./src/utils/passport.js";
 import compression from "express-compression";
-import { generateMockProducts } from "./src/utils/mockData.js";
 
 dotenv.config();
 
@@ -57,11 +56,6 @@ mongoose.connect(process.env.DB_LINK, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-// Generar productos mock si el servidor está en modo de desarrollo
-if (process.env.NODE_ENV === "development") {
-  await generateMockProducts(100); // Generar 100 productos mockeados
-}
 
 //Rutas
 app.use("/", CustomRouter);
