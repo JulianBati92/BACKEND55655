@@ -111,6 +111,13 @@ class ProductService {
       throw new Error('Error al buscar productos por etiqueta');
     }
   }
+
+  // Obtiene productos paginados de la base de datos
+  async getProductsPaginated(pageNumber, pageSize) {
+    const skip = (pageNumber - 1) * pageSize;
+    const products = await Product.find().skip(skip).limit(pageSize);
+    return products;
+  }
 }
 
 export default new ProductService();
