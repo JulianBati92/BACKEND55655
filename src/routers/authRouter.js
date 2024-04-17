@@ -1,7 +1,5 @@
 import { Router } from "express";
 import passport from "passport";
-import { UserManager } from "../../data/mongo/manager.mongo.js";
-import propsUser from "../../middlewares/propsUser.js";
 
 const router = Router();
 
@@ -22,6 +20,17 @@ router.post(
         failureRedirect: "/auth/login",
         failureFlash: true,
     })
+);
+
+// Google authentication routes
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+router.get(
+    "/google/callback",
+    passport.authenticate("google", { failureRedirect: "/auth/login" }),
+    (req, res) => {
+        res.redirect("/");
+    }
 );
 
 router.get("/logout", (req, res) => {

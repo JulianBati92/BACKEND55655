@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ProductManager } from "../../data/mongo/manager.mongo.js"; // Actualiza la importación del manager
-import propsProducts from "../../middlewares/propsProducts.js";
+import { ProductManager } from "../data/mongo/manager.mongo.js"; // Actualiza la importación del manager
+import propsProducts from "../middlewares/propsProducts.js";
 
 const productsRouter = Router();
 

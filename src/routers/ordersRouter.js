@@ -1,6 +1,6 @@
 import { Router } from "express";
-import ensureAuthenticated from "../../middlewares/ensureAuthenticated.js";
-import { OrderManager } from "../../data/mongo/manager.mongo.js";
+import ensureAuthenticated from "../middlewares/ensureAuthenticated.js";
+import { OrderManager } from "../data/mongo/manager.mongo.js";
 
 const ordersRouter = Router();
 
