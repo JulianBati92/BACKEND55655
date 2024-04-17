@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from "express";
 import morgan from "morgan";
 import bodyParser from "body-parser";
@@ -12,6 +13,23 @@ import { CustomRouter } from "./src/routers/api/custom.router.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 import passportConfig from "./src/utils/passport.js";
 import compression from "express-compression";
+=======
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const path = require('path');
+const dotenv = require('dotenv');
+const hbs = require('express-handlebars');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose'); 
+const passport = require('passport');
+const { connectToMongo } = require('./db');
+const { Product } = require('./manager.mongo'); 
+const { report } = require('./manager.mongo'); 
+const errorHandler = require('./middlewares/errorHandler');
+const apiRouter = require('./routers/api.router');
+>>>>>>> 54372215a19224f9bc41fb75cddb24cbc70aa450
 
 dotenv.config();
 
@@ -51,10 +69,28 @@ app.use(passport.initialize());
 app.use(passport.session());
 passportConfig(passport);
 
+<<<<<<< HEAD
 // Conexión a la base de datos mongoDB
 mongoose.connect(process.env.DB_LINK, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+=======
+// Conexión a MongoDB
+mongoose.connect(process.env.DB_LINK, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
+
+// Rutas de la API
+app.use('/api', apiRouter);
+
+app.post('/api/products', async (req, res, next) => {
+    try {
+        const product = await Product.create(req.body);
+        res.json(product);
+    } catch (error) {
+        next(error);
+    }
+>>>>>>> 54372215a19224f9bc41fb75cddb24cbc70aa450
 });
 
 //Rutas
