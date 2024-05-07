@@ -8,16 +8,24 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import passport from "passport";
-import { CustomRouter } from "./src/routers/api/custom.router.js";
+import { CustomRouter } from "./src/routers/customRouter.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 import passportConfig from "./src/utils/passport.js";
 import compression from "express-compression";
-import logger from './logger.js'; 
+import logger from './logger.js';
+import swaggerOptions from "./src/utils/swagger.js";
+import { serve, setup } from "swagger-ui-express"; 
+import swaggerJSDoc from "swagger-jsdoc"; 
+import swaggerOptions, { options } from "./src/utils/swagger.js";
 
 dotenv.config();
 
-const server = express(); // Cambio de nombre de 'app' a 'server'
+const server = express(); 
 const PORT = process.env.PORT || 8080;
+
+//swagger
+const specs = swaggerJSDoc(swaggerOptions); 
+server.use("api/docs", serve, setup(specs));  
 
 //Configuracion de Handlebars
 server.engine("handlebars", hbs({ defaultLayout: "main" }));

@@ -1,0 +1,49 @@
+components:
+  schemas:
+    register:
+      type: object
+      properties:
+        first_name:
+         type: string
+         description: Name of the user
+        last_name:
+         type: string
+         description: Last name of the user
+        email:
+         type: string
+         description: Email of the user
+        password:
+         type: string
+         description: Password to log of the user
+     example:
+       first_name: Elvis
+       last_name: Presley
+       email: thekingofrockandroll@gmail.com
+       password: Misisipi08011935
+  responses:
+    res201:
+     type: object
+     properties:
+      status:
+       type: string
+       description: Successfull Code
+      payload:
+       type: object
+       properties:
+        _id:
+         type: string
+        first_name:
+         type: string
+        last_name:
+         type: string
+        email:
+         type: string
+        avatar:
+         type: string
+        roll:
+         type: string
+      description: Data of the registered user
+    example:
+     status: sucess
+     payload:
+  

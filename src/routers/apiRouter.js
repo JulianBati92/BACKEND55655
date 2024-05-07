@@ -1,14 +1,12 @@
-import express from 'express';
-import authRouter from './authRouter.js';
-import ordersRouter from './api/ordersRouter.js';
-import productsRouter from './api/productsRouter.js'; 
-import usersRouter from './api/usersRouter.js'; 
-
+const express = require('express');
 const apiRouter = express.Router();
+const productController = require('../controllers/productController');
+const { ensureAuthenticated, isAdminOrPremium } = require('../middlewares/authMiddleware');
 
-apiRouter.use('/auth', authRouter);
-apiRouter.use('/orders', ordersRouter);
-apiRouter.use('/products', productsRouter);
-apiRouter.use('/users', usersRouter);
+// Endpoints para productos
+apiRouter.post('/', ensureAuthenticated, isAdminOrPremium, productController.createProduct);
+apiRouter.get('/', productController.getAllProducts);
+apiRouter.put('/:id', ensureAuthenticated, isAdminOrPremium, productController.updateProduct);
+apiRouter.delete('/:id', ensureAuthenticated, isAdminOrPremium, productController.deleteProduct);
 
-export default apiRouter;
+module.exports = apiRouter;
