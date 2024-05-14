@@ -15,8 +15,15 @@ import compression from "express-compression";
 import logger from './logger.js';
 import swaggerOptions from "./src/utils/swagger.js";
 import { serve, setup } from "swagger-ui-express"; 
+import { specs } from "./src/utils/swagger.js"
 import swaggerJSDoc from "swagger-jsdoc"; 
 import swaggerOptions, { options } from "./src/utils/swagger.js";
+import ticketRouter from "./src/routers/ticketRouter.js";
+import productRouter from "./src/routers/productRouter.js"; 
+import supertest from 'supertest'; 
+import { describe } from 'mocha'; 
+import { expect } from 'chai'; 
+
 
 dotenv.config();
 
@@ -68,6 +75,8 @@ mongoose.connect(process.env.DB_LINK, {
 
 // Rutas
 server.use("/", CustomRouter);
+server.use("/api/tickets", ticketRouter);
+server.use("/api/products", productRouter);
 
 // Ruta para probar los logs (Implementación de logger)
 server.get('/api/loggers', (req, res) => {

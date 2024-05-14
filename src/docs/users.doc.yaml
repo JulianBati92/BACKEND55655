@@ -15,7 +15,7 @@ components:
         password:
          type: string
          description: Password to log of the user
-     example:
+      example:
        first_name: Elvis
        last_name: Presley
        email: thekingofrockandroll@gmail.com
@@ -43,7 +43,8 @@ components:
         roll:
          type: string
       description: Data of the registered user
-    example:
-     status: sucess
-     payload:
-  
+     example:
+      status: sucess
+      payload:
+paths:
+ 
