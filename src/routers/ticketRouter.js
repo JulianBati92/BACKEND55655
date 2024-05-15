@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { TicketController } from "../controllers/ticketController.js";
-import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
+import { ensureAuthenticated } from "../middlewares/authMiddleware.js"; 
 
 const ticketRouter = Router();
 const ticketController = new TicketController();

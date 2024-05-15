@@ -13,32 +13,35 @@ import { errorHandler } from "./src/middlewares/errorHandler.js";
 import passportConfig from "./src/utils/passport.js";
 import compression from "express-compression";
 import logger from './logger.js';
-import swaggerOptions from "./src/utils/swagger.js";
+import swaggerJSDoc from "swagger-jsdoc";
 import { serve, setup } from "swagger-ui-express"; 
-import { specs } from "./src/utils/swagger.js"
-import swaggerJSDoc from "swagger-jsdoc"; 
-import swaggerOptions, { options } from "./src/utils/swagger.js";
 import ticketRouter from "./src/routers/ticketRouter.js";
-import productRouter from "./src/routers/productRouter.js"; 
-import supertest from 'supertest'; 
-import { describe } from 'mocha'; 
-import { expect } from 'chai'; 
-
+import productRouter from "./src/routers/productsRouter.js"; 
 
 dotenv.config();
 
 const server = express(); 
 const PORT = process.env.PORT || 8080;
 
-//swagger
+// Swagger
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Tu Matteoli",
+      description: "Documentation of API"
+    },
+  },
+  apis: ["./src/docs/*.yaml"]
+};
 const specs = swaggerJSDoc(swaggerOptions); 
-server.use("api/docs", serve, setup(specs));  
+server.use("/api/docs", serve, setup(specs));  
 
-//Configuracion de Handlebars
+// Configuración de Handlebars
 server.engine("handlebars", hbs({ defaultLayout: "main" }));
 server.set("view engine", "handlebars");
 
-//Middlewares
+// Middlewares
 server.use(morgan("dev"));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
@@ -49,7 +52,7 @@ server.use(
   })
 );
 
-//Configuracion de sesion
+// Configuración de sesión
 server.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
@@ -57,17 +60,17 @@ server.use(
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.DB_LINK }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 dia
+      maxAge: 1000 * 60 * 60 * 24, // 1 día
     },
   })
 );
 
-//Inicializacion de passport
+// Inicialización de passport
 server.use(passport.initialize());
 server.use(passport.session());
 passportConfig(passport);
 
-// Conexión a la base de datos mongoDB
+// Conexión a la base de datos MongoDB
 mongoose.connect(process.env.DB_LINK, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -90,7 +93,7 @@ server.get('/api/loggers', (req, res) => {
 // Manejo de errores
 server.use(errorHandler);
 
-// Inicializacion del servidor
+// Inicialización del servidor
 server.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`); // Utilizar el logger para registrar información sobre el servidor
 });

@@ -92,4 +92,4 @@ class MongoManager {
   }
 }
 
-module.exports = MongoManager;
+export { MongoManager };
