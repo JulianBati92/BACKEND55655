@@ -1,14 +1,17 @@
-import __dirname from "../../utils.js"
+import path from "path";
+console.log("Current directory:", __dirname); // Verifica la ruta actual
 
 const swaggerOptions = {
-    definition: {
-      openapi: "3.0.1",
-      info: {
-        title: "Tu Matteoli",
-        description: "Documentation of API"
-      },
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Tu Matteoli",
+      description: "Documentation of API"
     },
-    apis: [`${__dirname}/src/docs/*.yaml`]
-  };
-  
-  export default swaggerOptions;
+  },
+  apis: [path.resolve(__dirname, "../../docs/*.yaml")] 
+};
+
+console.log("Swagger options:", swaggerOptions); // Verifica las opciones de Swagger
+
+export default swaggerOptions;

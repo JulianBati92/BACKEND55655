@@ -9,27 +9,23 @@ const emailService = new EmailService();
 passport.use(
     new GoogleStrategy(
         {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL,
+            clientID: process.env.GOOGLE_ID,
+            clientSecret: process.env.GOOGLE_CLIENT,
+            callbackURL: process.env.GOOGLE_URL,
             passReqToCallback: true,
         },
         async (req, accessToken, refreshToken, profile, done) => {
             try {
-                let user = await MongoManager.readOne({ googleId: profile.id }); 
+                let user = await MongoManager.readOne({ googleId: profile.id });
 
                 if (!user) {
-                    // Crear el usuario si no existe en la base de datos
                     user = await MongoManager.create({
                         name: profile.displayName,
                         email: profile.emails[0].value,
                         googleId: profile.id,
                     });
 
-                    // Enviar correo electrónico de bienvenida
                     await emailService.sendWelcomeEmail(user.email);
-                    
-                    // Enviar mensaje de texto de bienvenida con Twilio
                     const message = '¡Bienvenido a nuestra Tienda!';
                     await sendSMS(user.phoneNumber, message);
                 }

@@ -1,50 +1,43 @@
 components:
   schemas:
-    register:
+    Register:
       type: object
       properties:
         first_name:
-         type: string
-         description: Name of the user
+          type: string
+          description: Name of the user
         last_name:
-         type: string
-         description: Last name of the user
+          type: string
+          description: Last name of the user
         email:
-         type: string
-         description: Email of the user
+          type: string
+          description: Email of the user
         password:
-         type: string
-         description: Password to log of the user
+          type: string
+          description: Password to log the user
       example:
-       first_name: Elvis
-       last_name: Presley
-       email: thekingofrockandroll@gmail.com
-       password: Misisipi08011935
-  responses:
-    res201:
-     type: object
-     properties:
-      status:
-       type: string
-       description: Successfull Code
-      payload:
-       type: object
-       properties:
-        _id:
-         type: string
-        first_name:
-         type: string
-        last_name:
-         type: string
-        email:
-         type: string
-        avatar:
-         type: string
-        roll:
-         type: string
-      description: Data of the registered user
-     example:
-      status: sucess
-      payload:
-paths:
- 
+        first_name: Elvis
+        last_name: Presley
+        email: elvispresley@coder.com
+        password: elrey
+
+  paths:
+    /register:
+      post:
+        summary: To register a user
+        tags:
+          - Sessions
+        requestBody:
+          required: true
+          description: data of the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+        responses:
+          '201':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Register'

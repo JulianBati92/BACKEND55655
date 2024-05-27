@@ -1,12 +1,14 @@
-const { MongoClient, ObjectId } = require('mongodb');
-require('dotenv').config();
+import { MongoClient, ObjectId } from 'mongodb';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 class MongoManager {
   constructor(collectionName) {
     this.url = process.env.MONGO_URL;
     this.dbName = process.env.MONGO_DB_NAME;
     this.collectionName = collectionName;
-    this.client = null; 
+    this.client = null;
   }
 
   async connect() {
@@ -32,19 +34,23 @@ class MongoManager {
     try {
       await this.connect();
       const result = await this.collection.insertOne(data);
-      return result.ops[0];
+      return result.ops[0];  
+    } catch (error) {
+      console.error(`Error creating document: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }
   }
 
-  async read({ filter, sortAndPaginate }) {
+  async read(filter = {}, sort = {}, limit = 0, skip = 0) {
     try {
       await this.connect();
-      const query = {};
-      if (filter) query.filter = filter;
-      const cursor = this.collection.find(query).sort(sortAndPaginate).limit(sortAndPaginate.limit).skip(sortAndPaginate.skip);
-      return cursor.toArray();
+      const cursor = this.collection.find(filter).sort(sort).limit(limit).skip(skip);
+      return await cursor.toArray();
+    } catch (error) {
+      console.error(`Error reading documents: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }
@@ -55,6 +61,9 @@ class MongoManager {
       await this.connect();
       const result = await this.collection.findOne({ _id: new ObjectId(id) });
       return result;
+    } catch (error) {
+      console.error(`Error reading document: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }
@@ -63,29 +72,38 @@ class MongoManager {
   async update(id, data) {
     try {
       await this.connect();
-      await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
+      const result = await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
+      return result.modifiedCount > 0;
+    } catch (error) {
+      console.error(`Error updating document: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }
   }
 
-  async destroy(id) {
+  async delete(id) {
     try {
       await this.connect();
-      await this.collection.deleteOne({ _id: new ObjectId(id) });
+      const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error(`Error deleting document: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }
   }
 
-  async report(uid) {
+  async report(userId) {
     try {
       await this.connect();
-      const userOrders = await this.collection.find({ userId: uid }).toArray();
-
+      const userOrders = await this.collection.find({ userId: userId }).toArray();
       const totalToPay = userOrders.reduce((total, order) => total + order.total, 0);
-
       return totalToPay;
+    } catch (error) {
+      console.error(`Error generating report: ${error.message}`);
+      throw error;
     } finally {
       await this.close();
     }

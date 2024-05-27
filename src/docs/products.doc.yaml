@@ -1,0 +1,55 @@
+components:
+  schemas:
+    PokemonProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Pokémon product
+        type:
+          type: string
+          description: Type of the Pokémon
+        price:
+          type: number
+          description: Price of the Pokémon product
+        description:
+          type: string
+          description: Description of the Pokémon product
+      example:
+        name: Pikachu Plush Toy
+        type: Plush Toy
+        price: 19.99
+        description: A cute and cuddly Pikachu plush toy, perfect for Pokémon fans of all ages.
+
+  paths:
+    /pokemon-products:
+      get:
+        summary: Retrieve all Pokémon products
+        tags:
+          - Pokémon Products
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PokemonProduct'
+      post:
+        summary: Create a new Pokémon product
+        tags:
+          - Pokémon Products
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonProduct'
+        responses:
+          '201':
+            description: Pokémon product created successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/PokemonProduct'

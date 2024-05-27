@@ -1,5 +1,5 @@
 import { createTicket, calculateTotal } from "../services/ticketService.js";
-import { CustomError } from "../utils/errors/errors.js";
+import CustomError from "../utils/errors/errors.js";
 
 class TicketController {
   async createTicket(req, res) {

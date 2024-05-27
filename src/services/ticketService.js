@@ -8,6 +8,19 @@ export const createTicket = async (ticketData) => {
   }
 };
 
+export const calculateTotal = async (userId) => {
+  try {
+    const tickets = await TicketModel.find({ userId });
+    let total = 0;
+    tickets.forEach(ticket => {
+      total += ticket.amount;
+    });
+    return total;
+  } catch (error) {
+    throw new Error('Error calculating total');
+  }
+};
+
 export const getTicketById = async (ticketId) => {
   try {
     return await TicketModel.findById(ticketId);
