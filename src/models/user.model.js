@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   username: String,
@@ -8,8 +8,9 @@ const userSchema = new mongoose.Schema({
   lastName: String,
   age: Number,
   address: String,
+  role: { type: String, enum: ["user", "admin", "premium"], default: "user" },
 });
 
-const UserModel = mongoose.model('User', userSchema);
+const UserModel = mongoose.model("User", userSchema);
 
 export default UserModel;

@@ -1,0 +1,43 @@
+components:
+  schemas:
+    Register:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Name of the user
+        last_name:
+          type: string
+          description: Last name of the user
+        email:
+          type: string
+          description: Email of the user
+        password:
+          type: string
+          description: Password to log the user
+      example:
+        first_name: Elvis
+        last_name: Presley
+        email: elvispresley@coder.com
+        password: elrey
+
+  paths:
+    /register:
+      post:
+        summary: To register a user
+        tags:
+          - Sessions
+        requestBody:
+          required: true
+          description: data of the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+        responses:
+          '201':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Register'

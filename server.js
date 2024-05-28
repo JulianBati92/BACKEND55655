@@ -1,107 +1,106 @@
-<<<<<<< HEAD
 import express from "express";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
-import hbs from "express-handlebars";
+import { engine as exphbs } from "express-handlebars"; 
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import passport from "passport";
-import { CustomRouter } from "./src/routers/api/custom.router.js";
+import CustomRouter from "./src/routers/customRouter.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
-import passportConfig from "./src/utils/passport.js";
+import configurePassport from "./src/utils/passport.js"; 
 import compression from "express-compression";
-=======
-const express = require('express');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const path = require('path');
-const dotenv = require('dotenv');
-const hbs = require('express-handlebars');
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const mongoose = require('mongoose'); 
-const passport = require('passport');
-const { connectToMongo } = require('./db');
-const { Product } = require('./manager.mongo'); 
-const { report } = require('./manager.mongo'); 
-const errorHandler = require('./middlewares/errorHandler');
-const apiRouter = require('./routers/api.router');
->>>>>>> 54372215a19224f9bc41fb75cddb24cbc70aa450
+import logger from "./src/utils/logger.js";
+import swaggerJSDoc from "swagger-jsdoc";
+import { serve, setup } from "swagger-ui-express";
+import ticketRouter from "./src/routers/ticketRouter.js";
+import productRouter from "./src/routers/productsRouter.js";
 
 dotenv.config();
 
-const app = express();
+const server = express();
 const PORT = process.env.PORT || 8080;
 
-//Configuracion de Handlebars
-app.engine("handlebars", hbs({ defaultLayout: "main" }));
-app.set("view engine", "handlebars");
+// Swagger
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Tu Matteoli",
+      description: "Documentation of API",
+    },
+  },
+  apis: ["./src/docs/*.yaml"],
+};
+const specs = swaggerJSDoc(swaggerOptions);
+server.use("/api/docs", serve, setup(specs));
 
-//Middlewares
-app.use(morgan("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(
+// Configuración de Handlebars
+server.engine("handlebars", exphbs({ defaultLayout: "main" })); 
+server.set("view engine", "handlebars");
+
+// Middlewares
+server.use(morgan("dev"));
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: true }));
+server.use(express.static(path.join(process.cwd(), "public"))); 
+server.use(
   compression({
     brotli: { enabled: true, zlib: {} },
   })
 );
 
-//Configuracion de sesion
-app.use(
+// Configuración de sesión
+server.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.DB_LINK }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 dia
+      maxAge: 1000 * 60 * 60 * 24, // 1 día
     },
   })
 );
 
-//Inicializacion de passport
-app.use(passport.initialize());
-app.use(passport.session());
-passportConfig(passport);
+// Inicialización de passport
+server.use(passport.initialize());
+server.use(passport.session());
 
-<<<<<<< HEAD
-// Conexión a la base de datos mongoDB
-mongoose.connect(process.env.DB_LINK, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-=======
-// Conexión a MongoDB
-mongoose.connect(process.env.DB_LINK, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('Error connecting to MongoDB:', err));
+// Conexión a la base de datos MongoDB
+mongoose
+  .connect(process.env.DB_LINK, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    logger.info("Connected to MongoDB");
+  })
+  .catch((err) => {
+    logger.error(`Failed to connect to MongoDB: ${err.message}`);
+    process.exit(1);
+  });
 
-// Rutas de la API
-app.use('/api', apiRouter);
+// Rutas
+server.use("/", CustomRouter);
+server.use("/api/tickets", ticketRouter);
+server.use("/api/products", productRouter);
 
-app.post('/api/products', async (req, res, next) => {
-    try {
-        const product = await Product.create(req.body);
-        res.json(product);
-    } catch (error) {
-        next(error);
-    }
->>>>>>> 54372215a19224f9bc41fb75cddb24cbc70aa450
+// Ruta para probar los logs (Implementación de logger)
+server.get("/api/loggers", (req, res) => {
+  logger.http("This is an HTTP level log");
+  logger.info("This is an INFO level log");
+  logger.error("This is an ERROR level log");
+  logger.fatal("This is a FATAL level log");
+  res.send("Logs generated. Check console and errors.log");
 });
 
-//Rutas
-app.use("/", CustomRouter);
+// Manejo de errores
+server.use(errorHandler);
 
-//Manejo de errores
-app.use(errorHandler);
-
-//Inicializacion del servidor
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Inicialización del servidor
+server.listen(PORT, () => {
+  logger.info(`Server is running on port ${PORT}`);
 });
-
-export default app;

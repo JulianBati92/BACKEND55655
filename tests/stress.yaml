@@ -1,0 +1,43 @@
+config:
+  target: 'http://localhost:8080'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+scenarios:
+  - flow:
+      - post:
+          url: '/api/login'
+          json:
+            username: 'testuser'
+            password: 'password'
+      - get:
+          url: '/api/products'
+      - post:
+          url: '/api/products'
+          json:
+            name: 'Test Product'
+            price: 100
+      - get:
+          url: '/api/tickets'
+      - post:
+          url: '/api/tickets'
+          json:
+            userId: 'testUserId'
+            amount: 100
+      - get:
+          url: '/api/orders'
+      - post:
+          url: '/api/orders'
+          json:
+            userId: 'testUserId'
+            products: [{ productId: 'testProductId', quantity: 2 }]
+      - get:
+          url: '/api/users'
+      - post:
+          url: '/api/users'
+          json:
+            username: 'testUser'
+            email: 'test@example.com'

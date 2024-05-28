@@ -1,5 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
+import propsUser from "../middlewares/propsUser.js";
 
 const router = Router();
 

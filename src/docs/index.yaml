@@ -1,0 +1,14 @@
+openapi: 3.0.1
+info:
+  title: Documentación de la API para Gestión de Productos de Anime y Usuarios
+  description: Documentación detallada de los puntos finales para gestionar productos de anime y registro de usuarios.
+  version: 1.0.0
+
+paths:
+  /api/productos-pokemon:
+    $ref: 'products.doc.yaml#/paths/pokemon-products'
+    summary: Endpoints relacionados con la gestión de productos Pokémon.
+
+  /api/sesiones/registro:
+    $ref: 'users.doc.yaml#/paths/registro'
+    summary: Endpoints relacionados con el registro de usuarios.
