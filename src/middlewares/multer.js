@@ -1,10 +1,22 @@
-import multer from 'multer'
-import __dirname from '../../utils.js'
+import multer from 'multer';
 
 const storage = multer.diskStorage({
-    destination: (req,file,cb) => cb(null,__dirname+'/public/img'),
-    filename: (req,file,cb) => cb(null,file.originalname)
-})
-const uploader = multer({storage})
+  destination: (req, file, cb) => {
+    if (file.fieldname === 'profile') {
+      cb(null, 'uploads/profiles');
+    } else if (file.fieldname === 'product') {
+      cb(null, 'uploads/products');
+    } else if (file.fieldname === 'document') {
+      cb(null, 'uploads/documents');
+    } else {
+      cb(null, 'uploads/others');
+    }
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-export default uploader
+const uploader = multer({ storage });
+
+export default uploader;
