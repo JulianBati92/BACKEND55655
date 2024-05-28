@@ -20,4 +20,3 @@ Abre el navegador y visita las siguientes rutas:
 ## Funcionalidades Adicionales
 - **Vista en Tiempo Real**: La vista `/real` se actualiza en tiempo real mediante sockets.
 - **Formulario de Creación**: En la vista `/form`, puedes crear nuevos productos en tiempo real.
-
