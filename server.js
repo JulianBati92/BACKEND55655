@@ -9,7 +9,7 @@ import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import passport from "passport";
 import viewsRouter from "./src/routers/viewsRouter.js";
-import CustomRouter from "./src/routers/customRouter.js";
+import authRouter from "./src/routers/authRouter.js";  
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 import configurePassport from "./src/utils/passport.js";
 import compression from "express-compression";
@@ -83,10 +83,10 @@ mongoose.connect(process.env.DB_LINK)
 });
 
 // Rutas
-server.use("/", CustomRouter);
+server.use("/", viewsRouter);
+server.use("/auth", authRouter);  // Asegúrate de usar /auth para las rutas de autenticación
 server.use("/api/tickets", ticketRouter);
 server.use("/api/products", productRouter);
-server.use("/", viewsRouter);
 
 // Ruta para probar los logs (Implementación de logger)
 server.get("/api/loggers", (req, res) => {

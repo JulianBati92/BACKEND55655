@@ -1,5 +1,6 @@
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import passport from 'passport';
+import './localStrategy.js';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { MongoManager } from "../data/mongo/manager.mongo.js";
 import EmailService from "../services/emailService.js";
 import { sendSMS } from "../services/twilioService.js";
@@ -7,6 +8,7 @@ import { sendSMS } from "../services/twilioService.js";
 const emailService = new EmailService();
 
 const configurePassport = () => {
+
   passport.use(
     new GoogleStrategy(
       {

@@ -1,5 +1,8 @@
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key';
 
 // Verificar usuario
 export const verifyUser = async (req, res) => {

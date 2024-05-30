@@ -10,7 +10,7 @@
     <div class="container mt-5">
         <h1>Iniciar Sesión</h1>
 
-        <form id="loginForm" action="/api/sessions/login" method="post">
+        <form id="loginForm" action="/auth/login" method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Nombre de Usuario:</label>
                 <input type="text" class="form-control" id="username" name="username" required>
@@ -22,6 +22,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            <a href="/auth/google" class="btn btn-danger btn-block mt-3">Iniciar Sesión con Google</a>
         </form>
     </div>
 

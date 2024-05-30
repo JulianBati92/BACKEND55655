@@ -1,5 +1,5 @@
-const productService = require('../services/productService');
-const errors = require('../utils/errors/errors');
+import productService from '../services/productService.js';
+import errors from '../utils/errors/errors.js';
 
 async function createProduct(req, res) {
   try {
@@ -49,10 +49,4 @@ async function getAllProducts(req, res) {
   }
 }
 
-module.exports = {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  getProduct,
-  getAllProducts
-};
+export { createProduct, updateProduct, deleteProduct, getProduct, getAllProducts };
