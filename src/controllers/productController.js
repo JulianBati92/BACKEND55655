@@ -40,12 +40,13 @@ async function getProduct(req, res) {
   }
 }
 
-async function getAllProducts(req, res) {
+async function getAllProducts() {
   try {
     const products = await productService.getAll();
-    res.json(products);
+    return products;
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    console.error("Error fetching products:", error);
+    throw new Error(errors.internalServerError.message);
   }
 }
 

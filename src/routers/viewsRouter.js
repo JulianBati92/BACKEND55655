@@ -1,9 +1,15 @@
 import express from "express";
+import { getAllProducts } from "../controllers/productController.js";
+
 const viewsRouter = express.Router();
 
-viewsRouter.get("/", (req, res) => {
-  res.render("home", { title: "Home" });
-  console.log("Reached the home route");
+viewsRouter.get("/", async (req, res) => {
+  try {
+    const products = await getAllProducts();
+    res.render("home", { title: "Home", products });
+  } catch (error) {
+    res.status(500).send("Error loading products");
+  }
 });
 
 viewsRouter.get("/login", (req, res) => {
