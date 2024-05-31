@@ -5,10 +5,17 @@ const viewsRouter = express.Router();
 
 viewsRouter.get("/", async (req, res) => {
   try {
-    const products = await getAllProducts();
-    res.render("home", { title: "Home", products });
+    const productsAll = await getAllProducts();
+
+    const simplifiedProducts = productsAll.map((product) => {
+      const productJson = JSON.parse(JSON.stringify(product));
+      return productJson;
+    });
+
+    res.render("home", { title: "Home", products: simplifiedProducts });
   } catch (error) {
-    res.status(500).send("Error loading products");
+    console.error("Error al obtener productos:", error);
+    res.status(500).send("Error interno del servidor");
   }
 });
 
