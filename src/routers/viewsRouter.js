@@ -23,6 +23,7 @@ viewsRouter.get("/form", (req, res) => {
   res.render("form", { title: "Form" });
 });
 
+
 viewsRouter.post("/id", async (req, res) => {
   const productId = req.body.id; 
   try {

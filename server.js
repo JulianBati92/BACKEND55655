@@ -18,8 +18,8 @@ import swaggerJSDoc from "swagger-jsdoc";
 import { serve, setup } from "swagger-ui-express";
 import ticketRouter from "./src/routers/ticketRouter.js";
 import productRouter from "./src/routers/productsRouter.js";
-import cartRouter from "./routers/cartRouter.js";
-import checkoutRouter from "./routers/checkoutRouter.js";
+import cartRouter from "./src/routers/cartRouter.js";
+import checkoutRouter from "./src/routers/checkoutRouter.js";
 
 dotenv.config();
 
@@ -87,11 +87,11 @@ mongoose
 
 // Rutas
 server.use("/", viewsRouter);
-server.use("/auth", authRouter); // Asegúrate de usar /auth para las rutas de autenticación
+server.use("/auth", authRouter); 
 server.use("/api/tickets", ticketRouter);
 server.use("/api/products", productRouter);
 server.use("/cart", cartRouter);
-serve.use("/checkout", checkoutRouter);
+server.use("/checkout", checkoutRouter);
 
 // Ruta para probar los logs (Implementación de logger)
 server.get("/api/loggers", (req, res) => {
