@@ -1,4 +1,4 @@
-import Product from '../data/models/Product';
+import Product from '../data/mongo/models/product.model.js';
 
 class ProductService {
   async create(productData) {

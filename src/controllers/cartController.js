@@ -1,49 +1,46 @@
-import { CartService } from "../services/cartService.js";
-import CustomError from "../utils/errors/CustomError.js";
-
-const cartService = new CartService();
+import cartService from "../services/cartService.js"; 
 
 class CartController {
   async createCart(req, res) {
+    const userId = req.user._id;
     try {
-      const userId = req.user._id;
       const cart = await cartService.createCart(userId);
       res.status(201).json(cart);
     } catch (error) {
-      res.status(error.statusCode || 500).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
   async getCartProducts(req, res) {
+    const userId = req.user._id;
     try {
-      const userId = req.user._id;
-      const cartProducts = await cartService.getCartProducts(userId);
-      res.status(200).json(cartProducts);
+      const cart = await cartService.getCartByUserId(userId);
+      res.status(200).json(cart);
     } catch (error) {
-      res.status(error.statusCode || 500).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
   async updateCartItem(req, res) {
+    const userId = req.user._id;
+    const productId = req.params.id;
+    const { quantity } = req.body;
     try {
-      const userId = req.user._id;
-      const { id: productId } = req.params;
-      const updateData = req.body;
-      const updatedItem = await cartService.updateCartItem(userId, productId, updateData);
-      res.status(200).json(updatedItem);
+      await cartService.updateCartItem(userId, productId, quantity);
+      res.status(200).send("Cart item updated");
     } catch (error) {
-      res.status(error.statusCode || 500).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
   async deleteCartItem(req, res) {
+    const userId = req.user._id;
+    const productId = req.params.id;
     try {
-      const userId = req.user._id;
-      const { id: productId } = req.params;
-      await cartService.deleteCartItem(userId, productId);
-      res.status(204).send();
+      await cartService.removeCartItem(userId, productId);
+      res.status(200).send("Cart item removed");
     } catch (error) {
-      res.status(error.statusCode || 500).json({ message: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 }

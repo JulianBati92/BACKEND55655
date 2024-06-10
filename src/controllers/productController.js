@@ -1,12 +1,14 @@
-const productService = require('../services/productService');
-const errors = require('../utils/errors/errors');
+import productService from "../services/productService.js";
+import errors from "../utils/errors/errors.js";
 
 async function createProduct(req, res) {
   try {
     const product = await productService.create(req.body);
     res.status(201).json(product);
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    res
+      .status(errors.internalServerError.statusCode)
+      .json({ message: errors.internalServerError.message });
   }
 }
 
@@ -15,16 +17,20 @@ async function updateProduct(req, res) {
     const updatedProduct = await productService.update(req.params.id, req.body);
     res.json(updatedProduct);
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    res
+      .status(errors.internalServerError.statusCode)
+      .json({ message: errors.internalServerError.message });
   }
 }
 
 async function deleteProduct(req, res) {
   try {
     await productService.delete(req.params.id);
-    res.json({ message: 'Producto eliminado exitosamente' });
+    res.json({ message: "Producto eliminado exitosamente" });
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    res
+      .status(errors.internalServerError.statusCode)
+      .json({ message: errors.internalServerError.message });
   }
 }
 
@@ -32,27 +38,41 @@ async function getProduct(req, res) {
   try {
     const product = await productService.getById(req.params.id);
     if (!product) {
-      return res.status(errors.notFound.statusCode).json({ message: errors.notFound.message });
+      return res
+        .status(errors.notFound.statusCode)
+        .json({ message: errors.notFound.message });
     }
     res.json(product);
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    res
+      .status(errors.internalServerError.statusCode)
+      .json({ message: errors.internalServerError.message });
   }
 }
 
-async function getAllProducts(req, res) {
+async function getAllProducts(req, res = null) {
   try {
     const products = await productService.getAll();
-    res.json(products);
+    if (res) {
+      res.json(products);
+    } else {
+      return products;
+    }
   } catch (error) {
-    res.status(errors.internalServerError.statusCode).json({ message: errors.internalServerError.message });
+    if (res) {
+      res
+        .status(errors.internalServerError.statusCode)
+        .json({ message: errors.internalServerError.message });
+    } else {
+      throw new Error(errors.internalServerError.message);
+    }
   }
 }
 
-module.exports = {
+export {
   createProduct,
   updateProduct,
   deleteProduct,
   getProduct,
-  getAllProducts
+  getAllProducts,
 };

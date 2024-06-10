@@ -1,8 +1,29 @@
-const express = require('express');
+import express from 'express';
+import { registerUser, verifyUser, promoteToPremium, uploadDocuments } from '../controllers/userController.js';
+import multer from 'multer';
+
 const userRouter = express.Router();
-const User = require('../models/');
-const authController = require('../controllers/authController');
 
-userRouter.post('/register', authController.registerUser);
+// Configuración de Multer para guardar archivos en diferentes carpetas
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (file.fieldname === 'profile') {
+      cb(null, 'uploads/profiles');
+    } else if (file.fieldname === 'product') {
+      cb(null, 'uploads/products');
+    } else if (file.fieldname === 'document') {
+      cb(null, 'uploads/documents');
+    }
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-module.exports = userRouter;
+const upload = multer({ storage });
+
+userRouter.post('/register', registerUser);
+userRouter.post('/:uid/documents', upload.array('documents'), uploadDocuments);
+userRouter.put('/premium/:uid', promoteToPremium);
+
+export default userRouter;

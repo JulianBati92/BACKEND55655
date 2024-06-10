@@ -1,32 +1,53 @@
-import { CartModel } from "../models/cartModel.js";
+import CartModel from '../models/cart.model.js';
 
 class CartService {
   async createCart(userId) {
-    const cart = await CartModel.create({ user: userId, products: [] });
+    const cart = new CartModel({ userId, items: [] });
+    await cart.save();
     return cart;
   }
 
-  async getCartProducts(userId) {
-    const cart = await CartModel.findOne({ user: userId }).populate("products");
-    return cart.products;
+  async getCartByUserId(userId) {
+    return await CartModel.findOne({ userId }).populate('items.productId');
   }
 
-  async updateCartItem(userId, productId, updateData) {
-    const cart = await CartModel.findOne({ user: userId });
-    const productIndex = cart.products.findIndex(product => product._id === productId);
-    if (productIndex === -1) {
-      throw new CustomError("Product not found in cart", 404);
+  async addItemToCart(userId, productId, quantity = 1) {
+    const cart = await this.getCartByUserId(userId);
+    if (cart) {
+      const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+      if (itemIndex > -1) {
+        cart.items[itemIndex].quantity += quantity;
+      } else {
+        cart.items.push({ productId, quantity });
+      }
+      await cart.save();
+    } else {
+      const newCart = new CartModel({
+        userId,
+        items: [{ productId, quantity }]
+      });
+      await newCart.save();
     }
-    cart.products[productIndex] = { ...cart.products[productIndex], ...updateData };
-    await cart.save();
-    return cart.products[productIndex];
   }
 
-  async deleteCartItem(userId, productId) {
-    const cart = await CartModel.findOne({ user: userId });
-    cart.products = cart.products.filter(product => product._id !== productId);
-    await cart.save();
+  async updateCartItem(userId, productId, quantity) {
+    const cart = await this.getCartByUserId(userId);
+    if (cart) {
+      const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+      if (itemIndex > -1) {
+        cart.items[itemIndex].quantity = quantity;
+        await cart.save();
+      }
+    }
+  }
+
+  async removeCartItem(userId, productId) {
+    const cart = await this.getCartByUserId(userId);
+    if (cart) {
+      cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+      await cart.save();
+    }
   }
 }
 
-export { CartService };
+export default new CartService();

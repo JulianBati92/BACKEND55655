@@ -1,4 +1,3 @@
-<!-- home.handlebars -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,21 +36,14 @@
     <div class="container mt-4">
         <h1>{{title}}</h1>
         <div class="row">
-            {{#each products}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="{{this.photo}}" class="card-img-top" alt="{{this.name}}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{this.name}}</h5>
-                            <p class="card-text">Precio: ${{this.price}}</p>
-                            <p class="card-text">Stock disponible: {{this.stock}}</p>
-                            <form action="/add-to-cart/{{this._id}}" method="POST">
-                                <button type="submit" class="btn btn-primary">Añadir al carrito</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            {{/each}}
+            <div class="col-12">
+                <h2>ID de compra: {{orderId}}</h2>
+                <ul>
+                    {{#each cart}}
+                        <li>{{this.name}} - ${{this.price}}</li>
+                    {{/each}}
+                </ul>
+            </div>
         </div>
     </div>
 

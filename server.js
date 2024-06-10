@@ -3,20 +3,23 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
-import { engine as exphbs } from "express-handlebars"; 
+import { engine as exphbs } from "express-handlebars";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import passport from "passport";
-import CustomRouter from "./src/routers/customRouter.js";
+import viewsRouter from "./src/routers/viewsRouter.js";
+import authRouter from "./src/routers/authRouter.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
-import configurePassport from "./src/utils/passport.js"; 
+import configurePassport from "./src/utils/passport.js";
 import compression from "express-compression";
 import logger from "./src/utils/logger.js";
 import swaggerJSDoc from "swagger-jsdoc";
 import { serve, setup } from "swagger-ui-express";
 import ticketRouter from "./src/routers/ticketRouter.js";
 import productRouter from "./src/routers/productsRouter.js";
+import cartRouter from "./src/routers/cartRouter.js";
+import checkoutRouter from "./src/routers/checkoutRouter.js";
 
 dotenv.config();
 
@@ -38,14 +41,15 @@ const specs = swaggerJSDoc(swaggerOptions);
 server.use("/api/docs", serve, setup(specs));
 
 // Configuración de Handlebars
-server.engine("handlebars", exphbs({ defaultLayout: "main" })); 
+server.engine("handlebars", exphbs({ defaultLayout: false }));
 server.set("view engine", "handlebars");
+server.set("views", path.join(process.cwd(), "src/views"));
 
 // Middlewares
 server.use(morgan("dev"));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(express.static(path.join(process.cwd(), "public"))); 
+server.use(express.static(path.join(process.cwd(), "public")));
 server.use(
   compression({
     brotli: { enabled: true, zlib: {} },
@@ -66,15 +70,13 @@ server.use(
 );
 
 // Inicialización de passport
+configurePassport();
 server.use(passport.initialize());
 server.use(passport.session());
 
 // Conexión a la base de datos MongoDB
 mongoose
-  .connect(process.env.DB_LINK, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.DB_LINK)
   .then(() => {
     logger.info("Connected to MongoDB");
   })
@@ -84,9 +86,12 @@ mongoose
   });
 
 // Rutas
-server.use("/", CustomRouter);
+server.use("/", viewsRouter);
+server.use("/auth", authRouter); 
 server.use("/api/tickets", ticketRouter);
 server.use("/api/products", productRouter);
+server.use("/cart", cartRouter);
+server.use("/checkout", checkoutRouter);
 
 // Ruta para probar los logs (Implementación de logger)
 server.get("/api/loggers", (req, res) => {
