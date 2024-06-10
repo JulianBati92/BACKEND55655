@@ -1,14 +1,22 @@
 import express from "express";
-import productService from "../services/productService.js";
+import { getAllProducts } from "../controllers/productController.js";
 
 const viewsRouter = express.Router();
 
 viewsRouter.get("/", async (req, res) => {
-  const productsAll = await productService.getAll();
-  const simplifiedProducts = productsAll.map((product) =>
-    JSON.parse(JSON.stringify(product))
-  );
-  res.render("home", { title: "Home", products: simplifiedProducts });
+  try {
+    const productsAll = await getAllProducts();
+
+    const simplifiedProducts = productsAll.map((product) => {
+      const productJson = JSON.parse(JSON.stringify(product));
+      return productJson;
+    });
+
+    res.render("home", { title: "Home", products: simplifiedProducts });
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    res.status(500).send("Error interno del servidor");
+  }
 });
 
 viewsRouter.get("/login", (req, res) => {
@@ -23,40 +31,8 @@ viewsRouter.get("/form", (req, res) => {
   res.render("form", { title: "Form" });
 });
 
-viewsRouter.post("/id", async (req, res) => {
-  const productId = req.body.id; 
-  try {
-      const product = await productService.getById(productId);
-
-      if (product && product.stock > 0) {
-          product.stock -= 1;
-          await productService.update(productId, { stock: product.stock });
-
-          const productInCart = {
-              id: product._id, 
-              name: product.name,
-              description: product.description,
-              price: product.price,
-              imageUrl: product.imageUrl,
-          };
-
-          req.session.cart = req.session.cart || [];
-          req.session.cart.push(productInCart);
-          res.redirect("/real");
-      } else {
-          res.status(400).send("Product out of stock");
-      }
-  } catch (error) {
-      res.status(500).send("Error adding product to cart");
-  }
-});
-
-
-viewsRouter.post("/checkout", (req, res) => {
-  const cart = req.session.cart || [];
-  const orderId = Math.floor(Math.random() * 1000000); // Generar un ID de pedido aleatorio
-  req.session.cart = []; 
-  res.render("checkout", { title: "Checkout", orderId: orderId, cart: cart });
+viewsRouter.get("/real", (req, res) => {
+  res.render("real", { title: "Real" });
 });
 
 export default viewsRouter;

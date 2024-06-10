@@ -9,7 +9,7 @@ import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 import passport from "passport";
 import viewsRouter from "./src/routers/viewsRouter.js";
-import authRouter from "./src/routers/authRouter.js";
+import authRouter from "./src/routers/authRouter.js";  
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 import configurePassport from "./src/utils/passport.js";
 import compression from "express-compression";
@@ -18,8 +18,6 @@ import swaggerJSDoc from "swagger-jsdoc";
 import { serve, setup } from "swagger-ui-express";
 import ticketRouter from "./src/routers/ticketRouter.js";
 import productRouter from "./src/routers/productsRouter.js";
-import cartRouter from "./routers/cartRouter.js";
-import checkoutRouter from "./routers/checkoutRouter.js";
 
 dotenv.config();
 
@@ -75,23 +73,20 @@ server.use(passport.initialize());
 server.use(passport.session());
 
 // Conexión a la base de datos MongoDB
-mongoose
-  .connect(process.env.DB_LINK)
-  .then(() => {
-    logger.info("Connected to MongoDB");
-  })
-  .catch((err) => {
-    logger.error(`Failed to connect to MongoDB: ${err.message}`);
-    process.exit(1);
-  });
+mongoose.connect(process.env.DB_LINK)
+.then(() => {
+  logger.info("Connected to MongoDB");
+})
+.catch((err) => {
+  logger.error(`Failed to connect to MongoDB: ${err.message}`);
+  process.exit(1);
+});
 
 // Rutas
 server.use("/", viewsRouter);
-server.use("/auth", authRouter); // Asegúrate de usar /auth para las rutas de autenticación
+server.use("/auth", authRouter);  // Asegúrate de usar /auth para las rutas de autenticación
 server.use("/api/tickets", ticketRouter);
 server.use("/api/products", productRouter);
-server.use("/cart", cartRouter);
-serve.use("/checkout", checkoutRouter);
 
 // Ruta para probar los logs (Implementación de logger)
 server.get("/api/loggers", (req, res) => {
