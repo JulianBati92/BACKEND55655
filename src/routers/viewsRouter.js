@@ -55,9 +55,15 @@ viewsRouter.post("/id", async (req, res) => {
 
 viewsRouter.post("/checkout", (req, res) => {
   const cart = req.session.cart || [];
-  const orderId = Math.floor(Math.random() * 1000000); // Generar un ID de pedido aleatorio
+  const orderId = Math.floor(Math.random() * 1000000); 
   req.session.cart = []; 
   res.render("checkout", { title: "Checkout", orderId: orderId, cart: cart });
+});
+
+// Nueva ruta para el pago
+
+viewsRouter.get("/payment", (req, res) => {
+  res.render("payment", { title: "Payment", stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
 });
 
 export default viewsRouter;

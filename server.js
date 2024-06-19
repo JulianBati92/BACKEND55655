@@ -20,6 +20,7 @@ import ticketRouter from "./src/routers/ticketRouter.js";
 import productRouter from "./src/routers/productsRouter.js";
 import cartRouter from "./src/routers/cartRouter.js";
 import checkoutRouter from "./src/routers/checkoutRouter.js";
+import paymentRoutes from "./src/routers/paymentRoutes.js";
 
 dotenv.config();
 
@@ -92,6 +93,7 @@ server.use("/api/tickets", ticketRouter);
 server.use("/api/products", productRouter);
 server.use("/cart", cartRouter);
 server.use("/checkout", checkoutRouter);
+server.use("/api/payments", paymentRoutes); 
 
 // Ruta para probar los logs (Implementación de logger)
 server.get("/api/loggers", (req, res) => {
