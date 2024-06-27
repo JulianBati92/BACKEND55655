@@ -27,7 +27,7 @@ class CartController {
     const { quantity } = req.body;
     try {
       await cartService.updateCartItem(userId, productId, quantity);
-      res.status(200).send("Cart item updated");
+      res.status(200).send("Producto actualizado en carrito");
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -38,7 +38,7 @@ class CartController {
     const productId = req.params.id;
     try {
       await cartService.removeCartItem(userId, productId);
-      res.status(200).send("Cart item removed");
+      res.status(200).send("Producto eliminado del carrito");
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

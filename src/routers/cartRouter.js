@@ -15,6 +15,6 @@ cartRouter.get("/", verifyUserRole, cartController.getCartProducts);
 cartRouter.put("/:id", verifyUserRole, cartController.updateCartItem);
 
 // Endpoint para eliminar un producto del carrito
-cartRouter.delete("/:id", verifyUserRole, cartController.deleteCartItem);
+cartRouter.post('/remove-from-cart/:id', verifyUserRole, cartController.deleteCartItem);
 
 export default cartRouter;
