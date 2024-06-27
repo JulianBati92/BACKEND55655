@@ -1,5 +1,5 @@
 import Product from '../models/product.model.js';
-import CustomError from '../../src/utils/errors/customError.js';
+import CustomError from '../utils/errors/CustomError.js';
 
 // Obtener todos los productos
 const getAllProducts = async (req, res) => {
