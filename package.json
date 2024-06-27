@@ -24,6 +24,8 @@
     "express-compression": "^1.0.2",
     "express-handlebars": "^7.1.2",
     "express-session": "^1.18.0",
+    "http-proxy": "^1.18.1",
+    "httpproxy": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
     "mongo": "^0.1.0",
     "mongodb": "^6.7.0",

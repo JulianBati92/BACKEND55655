@@ -1,6 +1,7 @@
 import supertest from 'supertest'; 
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import server from '../server.js';
 
 const api = supertest('http://localhost:8080');
 

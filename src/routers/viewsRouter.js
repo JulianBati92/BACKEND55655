@@ -1,5 +1,8 @@
 import express from "express";
 import productService from "../services/productService.js";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const viewsRouter = express.Router();
 
@@ -23,13 +26,11 @@ viewsRouter.get("/form", (req, res) => {
   res.render("form", { title: "Form" });
 });
 
-// Nueva ruta para ver el contenido del carrito
 viewsRouter.get("/real", (req, res) => {
   const cart = req.session.cart || [];
   res.render("real", { title: "Carrito", cart: cart });
 });
 
-// Ruta para añadir productos al carrito
 viewsRouter.post("/add-to-cart/:id", async (req, res) => {
   const productId = req.params.id; 
   try {
@@ -58,11 +59,45 @@ viewsRouter.post("/add-to-cart/:id", async (req, res) => {
   }
 });
 
-viewsRouter.post("/checkout", (req, res) => {
+viewsRouter.get("/checkout", (req, res) => {
   const cart = req.session.cart || [];
-  const orderId = Math.floor(Math.random() * 1000000); 
+  res.render("checkout", { title: "Checkout", cart: cart, stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
+});
+
+viewsRouter.post("/checkout", async (req, res) => {
+  const cart = req.session.cart || [];
+  
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: cart.map(item => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: item.price * 100, 
+        },
+        quantity: 1, 
+      })),
+      mode: 'payment',
+      success_url: `${req.protocol}://${req.get('host')}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.protocol}://${req.get('host')}/real`,
+    });
+
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error(error); 
+    res.status(500).send("Error processing payment");
+  }
+});
+
+viewsRouter.get("/confirmation", async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+  const cart = req.session.cart || [];
   req.session.cart = []; 
-  res.render("checkout", { title: "Checkout", orderId: orderId, cart: cart, stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
+
+  res.render("confirmation", { title: "Confirmation", session, cart });
 });
 
 export default viewsRouter;

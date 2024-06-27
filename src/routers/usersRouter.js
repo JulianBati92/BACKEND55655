@@ -1,6 +1,7 @@
 import express from 'express';
 import { registerUser, verifyUser, promoteToPremium, uploadDocuments } from '../controllers/userController.js';
 import multer from 'multer';
+import proxyRouter from '../utils/proxyRouter';
 
 const userRouter = express.Router();
 
@@ -22,8 +23,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-userRouter.post('/register', registerUser);
-userRouter.post('/:uid/documents', upload.array('documents'), uploadDocuments);
-userRouter.put('/premium/:uid', promoteToPremium);
+userRouter.post('/register', proxyRouter(registerUser));
+userRouter.post('/:uid/documents', upload.array('documents'), proxyRouter(uploadDocuments));
+userRouter.put('/premium/:uid', proxyRouter(promoteToPremium));
 
 export default userRouter;

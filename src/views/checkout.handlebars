@@ -7,107 +7,43 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">TuMatteoli</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Registro</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/form">Formulario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/real">Real</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    {{> navbar}}
 
     <div class="container mt-4">
-        <h1>{{title}}</h1>
-        <div class="row">
-            <div class="col-12">
-                <h2>ID de compra: {{orderId}}</h2>
-                <ul>
-                    {{#each cart}}
-                        <li>{{this.name}} - ${{this.price}}</li>
-                    {{/each}}
-                </ul>
+        <h1>Checkout</h1>
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="address">Dirección de envío:</label>
+                <input type="text" class="form-control" id="address" name="address" required>
             </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-12">
-                <form id="payment-form">
-                    <div id="card-element">
-                        <!-- Stripe.js will inject the Card Element here -->
-                    </div>
-                    <button id="submit-button" class="btn btn-primary">Pagar</button>
-                    <div id="payment-message" class="mt-2"></div>
-                </form>
+            <div class="form-group">
+                <label for="payment">Método de pago:</label>
+                <select class="form-control" id="payment" name="payment" required>
+                    <option value="credit-card">Tarjeta de crédito</option>
+                    <option value="paypal">PayPal</option>
+                </select>
             </div>
-        </div>
+            <button id="checkout-button" class="btn btn-primary">Realizar pedido</button>
+        </form>
     </div>
 
-    <footer class="bg-light text-center py-3">
-        <p>&copy; 2024 TuMatteoli. Todos los derechos reservados.</p>
-    </footer>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('{{stripePublicKey}}');
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-    const stripePublicKey = "{{stripePublicKey}}";
-    const stripe = Stripe(stripePublicKey);
-    const elements = stripe.elements();
-    const cardElement = elements.create('card');
-    cardElement.mount('#card-element');
-
-    const form = document.getElementById('payment-form');
-    const submitButton = document.getElementById('submit-button');
-    const paymentMessage = document.getElementById('payment-message');
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        submitButton.disabled = true;
-
-        const { clientSecret } = await fetch('/api/payments/create-payment-intent', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                amount: 1000, 
-                currency: 'usd'
-            })
-        }).then(res => res.json());
-
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardElement
-            }
+        const checkoutButton = document.getElementById('checkout-button');
+        checkoutButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const response = await fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+            const session = await response.json();
+            stripe.redirectToCheckout({ sessionId: session.id });
         });
-
-        if (error) {
-            paymentMessage.textContent = error.message;
-            submitButton.disabled = false;
-        } else if (paymentIntent.status === 'succeeded') {
-            paymentMessage.textContent = '¡Pago exitoso!';
-            window.location.href = '/checkout';
-        }
-    });
-</script>
-
+    </script>
 </body>
 </html>

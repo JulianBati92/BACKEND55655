@@ -1,78 +1,73 @@
-import productService from "../services/productService.js";
-import errors from "../utils/errors/errors.js";
+import Product from '../models/product.model.js';
+import CustomError from '../utils/errors/customError.js';
 
-async function createProduct(req, res) {
+// Obtener todos los productos
+const getAllProducts = async (req, res) => {
   try {
-    const product = await productService.create(req.body);
-    res.status(201).json(product);
+    const products = await Product.find();
+    res.json(products);
   } catch (error) {
-    res
-      .status(errors.internalServerError.statusCode)
-      .json({ message: errors.internalServerError.message });
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-async function updateProduct(req, res) {
+// Obtener producto por ID
+const getProductById = async (req, res) => {
   try {
-    const updatedProduct = await productService.update(req.params.id, req.body);
-    res.json(updatedProduct);
-  } catch (error) {
-    res
-      .status(errors.internalServerError.statusCode)
-      .json({ message: errors.internalServerError.message });
-  }
-}
-
-async function deleteProduct(req, res) {
-  try {
-    await productService.delete(req.params.id);
-    res.json({ message: "Producto eliminado exitosamente" });
-  } catch (error) {
-    res
-      .status(errors.internalServerError.statusCode)
-      .json({ message: errors.internalServerError.message });
-  }
-}
-
-async function getProduct(req, res) {
-  try {
-    const product = await productService.getById(req.params.id);
+    const product = await Product.findById(req.params.id);
     if (!product) {
-      return res
-        .status(errors.notFound.statusCode)
-        .json({ message: errors.notFound.message });
+      throw CustomError.new('notFound');
     }
     res.json(product);
   } catch (error) {
-    res
-      .status(errors.internalServerError.statusCode)
-      .json({ message: errors.internalServerError.message });
+    res.status(error.statusCode || 500).json({ error: error.message });
   }
-}
+};
 
-async function getAllProducts(req, res = null) {
+// Crear nuevo producto
+const createProduct = async (req, res) => {
   try {
-    const products = await productService.getAll();
-    if (res) {
-      res.json(products);
-    } else {
-      return products;
-    }
+    const newProduct = new Product(req.body);
+    await newProduct.save();
+    res.status(201).json(newProduct);
   } catch (error) {
-    if (res) {
-      res
-        .status(errors.internalServerError.statusCode)
-        .json({ message: errors.internalServerError.message });
-    } else {
-      throw new Error(errors.internalServerError.message);
-    }
+    res.status(400).json({ error: error.message });
   }
-}
+};
+
+// Actualizar producto
+const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!product) {
+      throw CustomError.new('notFound');
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+// Eliminar producto
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) {
+      throw CustomError.new('notFound');
+    }
+    res.json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
 
 export {
+  getAllProducts,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-  getProduct,
-  getAllProducts,
 };

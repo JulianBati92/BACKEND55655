@@ -1,9 +1,7 @@
-const errorHandler = (error, req, res, next) => {
-    console.error(error);
-    return res.status(error.statusCode || 500).json({
-        statusCode: error.statusCode || 500,
-        message: `${req.method} ${req.url} ${error.message}`,
-    });
+export const errorHandler = (err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(statusCode).json({ message });
 };
 
-export { errorHandler };
+export default errorHandler;
