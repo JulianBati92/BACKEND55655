@@ -1,0 +1,30 @@
+/openapi: 3.0.1
+info:
+  title: Authentication API
+  description: API for user authentication
+  version: 1.0.0
+
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticate user and return JWT token
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error

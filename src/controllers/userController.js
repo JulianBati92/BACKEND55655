@@ -1,6 +1,7 @@
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import CustomError from '../utils/errors/CustomError.js';
 
 const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key';
 
@@ -11,11 +12,11 @@ export const verifyUser = async (req, res) => {
     const user = await UserModel.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      throw CustomError.new('USER_NOT_FOUND');
     }
 
     if (user.verificationCode !== verificationCode) {
-      return res.status(400).json({ message: 'Invalid verification code' });
+      throw CustomError.new('INVALID_VERIFICATION_CODE');
     }
 
     user.verified = true;
@@ -23,7 +24,7 @@ export const verifyUser = async (req, res) => {
 
     res.status(200).json({ message: 'User verified successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
@@ -34,7 +35,7 @@ export const uploadDocuments = async (req, res) => {
     const user = await UserModel.findById(uid);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      throw CustomError.new('USER_NOT_FOUND');
     }
 
     const documents = req.files.map(file => ({
@@ -47,7 +48,7 @@ export const uploadDocuments = async (req, res) => {
 
     res.status(200).json({ message: 'Documents uploaded successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
@@ -58,7 +59,7 @@ export const promoteToPremium = async (req, res) => {
     const user = await UserModel.findById(uid);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      throw CustomError.new('USER_NOT_FOUND');
     }
 
     const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
@@ -67,7 +68,7 @@ export const promoteToPremium = async (req, res) => {
     const hasAllDocuments = requiredDocuments.every(doc => userDocuments.includes(doc));
 
     if (!hasAllDocuments) {
-      return res.status(400).json({ message: 'User has not completed the required documentation' });
+      throw CustomError.new('INCOMPLETE_DOCUMENTATION');
     }
 
     user.role = 'premium';
@@ -75,7 +76,7 @@ export const promoteToPremium = async (req, res) => {
 
     res.status(200).json({ message: 'User promoted to premium successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
@@ -84,16 +85,13 @@ export const registerUser = async (req, res) => {
   try {
     const { username, email, password, firstName, lastName, age, address } = req.body;
 
-    // Verificar si el usuario ya existe
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already in use' });
+      throw CustomError.new('EMAIL_ALREADY_IN_USE');
     }
 
-    // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear nuevo usuario
     const newUser = new UserModel({
       username,
       email,
@@ -106,12 +104,11 @@ export const registerUser = async (req, res) => {
       last_connection: null,
     });
 
-    // Guardar usuario en la base de datos
     await newUser.save();
 
     res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
