@@ -24,7 +24,7 @@ viewsRouter.get('/real', (req, res) => {
   res.render('real', { title: 'Carrito', cart: cart });
 });
 
-router.get('/dashboard', authPolicy, (req, res) => {
+viewsRouter.get('/dashboard', authPolicy, (req, res) => {
   res.render('dashboard', { user: req.user });
 });
 
