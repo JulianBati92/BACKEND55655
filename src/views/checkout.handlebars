@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css"> <!-- Agrega tu archivo CSS personalizado -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     {{> navbar}}
@@ -12,6 +14,9 @@
     <div class="container mt-4">
         <h1>Checkout</h1>
         <form id="checkout-form">
+            {{#each cart}}
+            <input type="hidden" name="items[]" value="{{this.id}}">
+            {{/each}}
             <div class="form-group">
                 <label for="address">Dirección de envío:</label>
                 <input type="text" class="form-control" id="address" name="address" required>
@@ -19,7 +24,7 @@
             <div class="form-group">
                 <label for="payment">Método de pago:</label>
                 <select class="form-control" id="payment" name="payment" required>
-                    <option value="credit-card">Tarjeta de crédito</option>
+                    <option value="stripe">Tarjeta de crédito (Stripe)</option>
                     <option value="paypal">PayPal</option>
                 </select>
             </div>
@@ -27,23 +32,31 @@
         </form>
     </div>
 
-    <script src="https://js.stripe.com/v3/"></script>
     <script>
-        const stripe = Stripe('{{stripePublicKey}}');
+        const stripePublicKey = '{{pk_test_51OFzUzIui13gsswyoPefDA99KWJFoBW0zft04I5L2WtFrLwy0YlOll72AXQCUp5VUyPupyC4AWDgcjKTHEYKvZ9L001HpdTQUo}}';
+        const stripe = Stripe(stripePublicKey);
 
         const checkoutButton = document.getElementById('checkout-button');
         checkoutButton.addEventListener('click', async (event) => {
             event.preventDefault();
-            const response = await fetch('/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
+
+            const { error } = await stripe.redirectToCheckout({
+                lineItems: [
+                    { price: 'price_1JKgqzIui13gsswyzk3IIfUe', quantity: 1 },
+                ],
+                mode: 'payment',
+                successUrl: `${window.location.origin}/confirmation`,
+                cancelUrl: `${window.location.origin}/real`,
             });
-            const session = await response.json();
-            stripe.redirectToCheckout({ sessionId: session.id });
+
+            if (error) {
+                console.error(error);
+            }
         });
     </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

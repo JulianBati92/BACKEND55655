@@ -11,7 +11,7 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import viewsRouter from './src/routers/viewsRouter.js';
 import authRouter from './src/routers/authRouter.js';
-import errorHandler from './src/middlewares/errorHandler.js'; 
+import errorHandler from './src/middlewares/errorHandler.js';
 import configurePassport from './src/utils/passport.js';
 import compression from 'express-compression';
 import logger from './src/utils/logger.js';
@@ -23,11 +23,15 @@ import cartRouter from './src/routers/cartRouter.js';
 import checkoutRouter from './src/routers/checkoutRouter.js';
 import paymentRoutes from './src/routers/paymentRoutes.js';
 import proxyRouter from './src/utils/proxyRouter.js';
+import Stripe from 'stripe';
 
 dotenv.config();
 
 const server = express();
 const PORT = process.env.PORT || 8080;
+
+// Configuración de Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Swagger
 const swaggerOptions = {
@@ -102,7 +106,7 @@ server.use('/auth', authRouter);
 server.use('/api/tickets', ticketRouter);
 server.use('/api/products', productRouter);
 server.use('/cart', cartRouter);
-server.use('/checkout', checkoutRouter);
+server.use('/checkout', checkoutRouter);  
 server.use('/api/payments', paymentRoutes);
 server.use('/proxy', proxyRouter);
 
@@ -115,7 +119,7 @@ server.get('/api/loggers', (req, res) => {
   res.send('Logs generated. Check console and errors.log');
 });
 
-// Manejo de errores 
+// Manejo de errores
 server.use(errorHandler);
 
 // Inicialización del servidor

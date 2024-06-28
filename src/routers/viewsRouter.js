@@ -1,38 +1,31 @@
-import express from "express";
-import productService from "../services/productService.js";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import express from 'express';
+import productService from '../services/productService.js';
+import stripe from '../utils/stripe.js'; 
 
 const viewsRouter = express.Router();
 
-viewsRouter.get("/", async (req, res) => {
+viewsRouter.get('/', async (req, res) => {
   const productsAll = await productService.getAll();
-  const simplifiedProducts = productsAll.map((product) =>
-    JSON.parse(JSON.stringify(product))
-  );
-  res.render("home", { title: "Home", products: simplifiedProducts });
+  const simplifiedProducts = productsAll.map((product) => JSON.parse(JSON.stringify(product)));
+  res.render('home', { title: 'Home', products: simplifiedProducts });
 });
 
-viewsRouter.get("/login", (req, res) => {
-  res.render("login", { title: "Login" });
+viewsRouter.get('/login', (req, res) => {
+  res.render('login', { title: 'Login' });
 });
 
-viewsRouter.get("/register", (req, res) => {
-  res.render("register", { title: "Register" });
+viewsRouter.get('/register', (req, res) => {
+  res.render('register', { title: 'Register' });
 });
 
-viewsRouter.get("/form", (req, res) => {
-  res.render("form", { title: "Form" });
-});
-
-viewsRouter.get("/real", (req, res) => {
+viewsRouter.get('/real', (req, res) => {
   const cart = req.session.cart || [];
-  res.render("real", { title: "Carrito", cart: cart });
+  res.render('real', { title: 'Carrito', cart: cart });
 });
 
-viewsRouter.post("/add-to-cart/:id", async (req, res) => {
-  const productId = req.params.id; 
+viewsRouter.post('/add-to-cart/:id', async (req, res) => {
+  const productId = req.params.id;
+  
   try {
     const product = await productService.getById(productId);
 
@@ -41,7 +34,7 @@ viewsRouter.post("/add-to-cart/:id", async (req, res) => {
       await productService.update(productId, { stock: product.stock });
 
       const productInCart = {
-        id: product._id, 
+        id: product._id,
         name: product.name,
         description: product.description,
         price: product.price,
@@ -50,23 +43,24 @@ viewsRouter.post("/add-to-cart/:id", async (req, res) => {
 
       req.session.cart = req.session.cart || [];
       req.session.cart.push(productInCart);
-      res.redirect("/real");
+      res.redirect('/real');
     } else {
-      res.status(400).send("Product out of stock");
+      res.status(400).send('Product out of stock');
     }
   } catch (error) {
-    res.status(500).send("Error adding product to cart");
+    console.error(error);
+    res.status(500).send('Error adding product to cart');
   }
 });
 
-viewsRouter.get("/checkout", (req, res) => {
+viewsRouter.get('/checkout', (req, res) => {
   const cart = req.session.cart || [];
-  res.render("checkout", { title: "Checkout", cart: cart, stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
+  res.render('checkout', { title: 'Checkout', cart: cart, stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
 });
 
-viewsRouter.post("/checkout", async (req, res) => {
+viewsRouter.post('/create-checkout-session', async (req, res) => {
   const cart = req.session.cart || [];
-  
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -76,9 +70,9 @@ viewsRouter.post("/checkout", async (req, res) => {
           product_data: {
             name: item.name,
           },
-          unit_amount: item.price * 100, 
+          unit_amount: item.price * 100,
         },
-        quantity: 1, 
+        quantity: 1,
       })),
       mode: 'payment',
       success_url: `${req.protocol}://${req.get('host')}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
@@ -87,17 +81,30 @@ viewsRouter.post("/checkout", async (req, res) => {
 
     res.json({ id: session.id });
   } catch (error) {
-    console.error(error); 
-    res.status(500).send("Error processing payment");
+    console.error(error);
+    res.status(500).send('Error processing payment');
   }
 });
 
-viewsRouter.get("/confirmation", async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-  const cart = req.session.cart || [];
-  req.session.cart = []; 
+viewsRouter.get('/confirmation', async (req, res) => {
+  const session_id = req.query.session_id;
 
-  res.render("confirmation", { title: "Confirmation", session, cart });
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    const cart = req.session.cart || [];
+    req.session.cart = [];
+
+    res.render('confirmation', { title: 'Confirmation', session, cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving checkout session');
+  }
+});
+
+viewsRouter.post('/remove-from-cart/:id', (req, res) => {
+  const productId = req.params.id;
+  req.session.cart = req.session.cart.filter(item => item._id !== productId);
+  res.redirect('/real');
 });
 
 export default viewsRouter;

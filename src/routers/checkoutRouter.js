@@ -1,5 +1,6 @@
 import express from 'express';
 import productService from '../services/productService.js';
+import stripe from '../utils/stripe.js';
 
 const checkoutRouter = express.Router();
 
@@ -17,15 +18,29 @@ checkoutRouter.post('/add-to-cart/:id', async (req, res) => {
     }
 });
 
-checkoutRouter.post('/checkout', (req, res) => {
+checkoutRouter.post('/checkout', async (req, res) => {
     const cart = req.session.cart || [];
-    const orderId = Math.floor(Math.random() * 1000000); // Generar un ID de pedido aleatorio
-    req.session.cart = []; // Vaciar el carrito después de la compra
-    res.render('checkout', { title: 'Checkout', orderId: orderId, cart: cart });
+    const totalAmount = cart.reduce((total, product) => total + product.price * product.quantity, 0);
+
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: totalAmount * 100, 
+            currency: 'usd',
+            automatic_payment_methods: {
+                enabled: true,
+            },
+        });
+
+        const clientSecret = paymentIntent.client_secret;
+        res.render('checkout', { title: 'Checkout', clientSecret: clientSecret, cart: cart });
+    } catch (error) {
+        console.error('Error creating PaymentIntent:', error);
+        res.status(500).json({ error: 'Error creating PaymentIntent' });
+    }
 });
 
 checkoutRouter.get('/confirmation', (req, res) => {
-    const purchaseId = Math.floor(Math.random() * 1000000); // Generar un ID de compra aleatorio
+    const purchaseId = Math.floor(Math.random() * 1000000); 
     res.render('confirmation', { title: 'Confirmación de Compra', purchaseId: purchaseId });
 });
 
