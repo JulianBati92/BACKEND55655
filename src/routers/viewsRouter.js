@@ -1,10 +1,7 @@
 import express from 'express';
 import productService from '../services/productService.js';
 import stripe from '../utils/stripe.js'; 
-<<<<<<< Updated upstream
-=======
 import authPolicy from '../middlewares/authPolicy.js';
->>>>>>> Stashed changes
 
 const viewsRouter = express.Router();
 
@@ -27,13 +24,10 @@ viewsRouter.get('/real', (req, res) => {
   res.render('real', { title: 'Carrito', cart: cart });
 });
 
-<<<<<<< Updated upstream
-=======
 router.get('/dashboard', authPolicy, (req, res) => {
   res.render('dashboard', { user: req.user });
 });
 
->>>>>>> Stashed changes
 viewsRouter.post('/add-to-cart/:id', async (req, res) => {
   const productId = req.params.id;
   
