@@ -64,10 +64,58 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-export {
-  getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+// Obtener productos del usuario premium
+const getMyProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ owner_id: req.user._id });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
+// Crear producto del usuario premium
+const createMyProduct = async (req, res) => {
+  try {
+    const newProduct = new Product({ ...req.body, owner_id: req.user._id });
+    await newProduct.save();
+    res.status(201).json(newProduct);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Actualizar producto del usuario premium
+const updateMyProduct = async (req, res) => {
+  try {
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, owner_id: req.user._id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!product) {
+      throw CustomError.new('notFound');
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+// Eliminar producto del usuario premium
+const deleteMyProduct = async (req, res) => {
+  try {
+    const product = await Product.findOneAndDelete({
+      _id: req.params.id,
+      owner_id: req.user._id,
+    });
+    if (!product) {
+      throw CustomError.new('notFound');
+    }
+    res.json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getMyProducts, createMyProduct, updateMyProduct, deleteMyProduct };

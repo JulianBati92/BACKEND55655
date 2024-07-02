@@ -9,12 +9,12 @@ const cartController = new CartController();
 cartRouter.post("/", verifyUserRole(["admin"]), cartController.createCart);
 
 // Endpoint para ver los productos del carrito
-cartRouter.get("/", verifyUserRole, cartController.getCartProducts);
+cartRouter.get("/", verifyUserRole(["admin", "user", "premium"]), cartController.getCartProducts);
 
 // Endpoint para actualizar un producto del carrito
-cartRouter.put("/:id", verifyUserRole, cartController.updateCartItem);
+cartRouter.put("/:id", verifyUserRole(["admin", "user", "premium"]), cartController.updateCartItem);
 
 // Endpoint para eliminar un producto del carrito
-cartRouter.post('/remove-from-cart/:id', verifyUserRole, cartController.deleteCartItem);
+cartRouter.post('/remove-from-cart/:id', verifyUserRole(["admin", "user", "premium"]), cartController.deleteCartItem);
 
 export default cartRouter;

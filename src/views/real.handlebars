@@ -1,4 +1,3 @@
-<!-- src/views/real.handlebars -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,12 +15,11 @@
             {{#each cart}}
                 <div class="col-md-4 mb-4">
                     <div class="card">
-                        <img src="{{this.photo}}" class="card-img-top" alt="{{this.name}}">
+                        <img src="{{this.imageUrl}}" class="card-img-top" alt="{{this.name}}">
                         <div class="card-body">
                             <h5 class="card-title">{{this.name}}</h5>
                             <p class="card-text">Precio: ${{this.price}}</p>
-                            <p class="card-text">Cantidad: {{this.quantity}}</p>
-                            <form action="/remove-from-cart/{{this._id}}" method="POST">
+                            <form action="/remove-from-cart/{{this.id}}" method="POST">
                                 <button type="submit" class="btn btn-danger">Eliminar del carrito</button>
                             </form>
                         </div>
@@ -31,7 +29,7 @@
         </div>
         {{#if cart.length}}
         <div class="text-center mt-4">
-            <form action="/checkout" method="POST">
+            <form action="/create-checkout-session" method="POST">
                 <button type="submit" class="btn btn-success">Finalizar Compra</button>
             </form>
         </div>

@@ -110,4 +110,15 @@ class MongoManager {
   }
 }
 
-export { MongoManager };
+// Definimos una clase específica para gestionar órdenes
+class OrderManager extends MongoManager {
+  constructor() {
+    super('orders'); // Nombre de la colección de órdenes
+  }
+
+  async getOrdersByUserId(userId) {
+    return this.read({ userId: new ObjectId(userId) });
+  }
+}
+
+export { MongoManager, OrderManager };

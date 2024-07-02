@@ -1,14 +1,22 @@
 import express from "express";
-import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct } from "../controllers/productController.js";
-import { verifyUserRole } from "../middlewares/authMiddleware.js";
+import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getMyProducts, createMyProduct, updateMyProduct, deleteMyProduct, } from "../controllers/productController.js";
+import { isAuthenticated, isAdmin, isPremiumUser, } from "../middlewares/authMiddleware.js";
 
 const productRouter = express.Router();
 
-// Definición de rutas
+// Rutas abiertas
 productRouter.get("/", getAllProducts);
 productRouter.get("/:id", getProductById);
-productRouter.post("/", verifyUserRole(["admin"]), createProduct);
-productRouter.put("/:id", verifyUserRole(["admin"]), updateProduct);
-productRouter.delete("/:id", verifyUserRole(["admin"]), deleteProduct);
+
+// Rutas para administradores
+productRouter.post("/", isAuthenticated, isAdmin, createProduct);
+productRouter.put("/:id", isAuthenticated, isAdmin, updateProduct);
+productRouter.delete("/:id", isAuthenticated, isAdmin, deleteProduct);
+
+// Rutas para usuarios premium
+productRouter.get("/me", isAuthenticated, isPremiumUser, getMyProducts);
+productRouter.post("/me", isAuthenticated, isPremiumUser, createMyProduct);
+productRouter.put("/me/:id", isAuthenticated, isPremiumUser, updateMyProduct);
+productRouter.delete( "/me/:id", isAuthenticated, isPremiumUser, deleteMyProduct);
 
 export default productRouter;

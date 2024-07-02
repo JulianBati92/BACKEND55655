@@ -108,7 +108,7 @@ viewsRouter.get('/confirmation', async (req, res) => {
 
 viewsRouter.post('/remove-from-cart/:id', (req, res) => {
   const productId = req.params.id;
-  req.session.cart = req.session.cart.filter(item => item._id !== productId);
+  req.session.cart = req.session.cart.filter(item => item.id !== productId);
   res.redirect('/real');
 });
 

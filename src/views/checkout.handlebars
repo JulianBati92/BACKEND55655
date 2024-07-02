@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css"> <!-- Agrega tu archivo CSS personalizado -->
+    <link rel="stylesheet" href="style.css"> 
     <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
@@ -33,20 +33,20 @@
     </div>
 
     <script>
-        const stripePublicKey = '{{pk_test_51OFzUzIui13gsswyoPefDA99KWJFoBW0zft04I5L2WtFrLwy0YlOll72AXQCUp5VUyPupyC4AWDgcjKTHEYKvZ9L001HpdTQUo}}';
+        const stripePublicKey = '{{stripePublicKey}}';
         const stripe = Stripe(stripePublicKey);
 
         const checkoutButton = document.getElementById('checkout-button');
         checkoutButton.addEventListener('click', async (event) => {
             event.preventDefault();
 
+            const response = await fetch('/create-checkout-session', {
+                method: 'POST',
+            });
+            const session = await response.json();
+
             const { error } = await stripe.redirectToCheckout({
-                lineItems: [
-                    { price: 'price_1JKgqzIui13gsswyzk3IIfUe', quantity: 1 },
-                ],
-                mode: 'payment',
-                successUrl: `${window.location.origin}/confirmation`,
-                cancelUrl: `${window.location.origin}/real`,
+                sessionId: session.id,
             });
 
             if (error) {
