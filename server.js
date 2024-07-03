@@ -1,10 +1,8 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import path from 'path';
+import dotenv from 'dotenv';
 import { create } from 'express-handlebars';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
@@ -28,6 +26,7 @@ import proxyRouter from './src/utils/proxyRouter.js';
 import Stripe from 'stripe';
 import ordersRouter from './src/routers/ordersRouter.js';
 
+dotenv.config();
 
 const server = express();
 const PORT = process.env.PORT || 8080;

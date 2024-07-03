@@ -6,41 +6,69 @@ const checkoutRouter = express.Router();
 
 checkoutRouter.post('/add-to-cart/:id', async (req, res) => {
     const productId = req.params.id;
-    const product = await productService.getById(productId); 
-    if (product && product.stock > 0) {
-        product.stock -= 1;
-        await productService.update(productId, { stock: product.stock });
-        req.session.cart = req.session.cart || [];
-        req.session.cart.push(product);
-        res.redirect('/real');
-    } else {
-        res.status(400).send("Product out of stock");
+    try {
+        const product = await productService.getById(productId);
+        if (product && product.stock > 0) {
+            product.stock -= 1;
+            await productService.update(productId, { stock: product.stock });
+            req.session.cart = req.session.cart || [];
+            req.session.cart.push({
+                id: product.id,
+                title: product.title,
+                price: product.price,
+                photo: product.photo,
+                quantity: 1,
+            });
+            console.log("Product added to cart:", product);
+            res.redirect('/real');
+        } else {
+            res.status(400).send("Product out of stock");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error adding product to cart');
     }
 });
 
-checkoutRouter.post('/checkout', async (req, res) => {
+checkoutRouter.post('/create-checkout-session', async (req, res) => {
     const cart = req.session.cart || [];
-    const totalAmount = cart.reduce((total, product) => total + product.price * product.quantity, 0);
+    
+    console.log("Cart:", cart);
+
+    const invalidItems = cart.filter(item => !item.title || !item.price || !item.photo);
+    if (invalidItems.length > 0) {
+        return res.status(400).send('Some items in the cart are missing required fields.');
+    }
 
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: totalAmount * 100, 
-            currency: 'usd',
-            automatic_payment_methods: {
-                enabled: true,
-            },
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: cart.map(item => ({
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: item.title,
+                        description: item.description || 'No description available',
+                        images: [item.photo],
+                    },
+                    unit_amount: item.price * 100,
+                },
+                quantity: item.quantity,
+            })),
+            mode: 'payment',
+            success_url: `${req.protocol}://${req.get('host')}/checkout/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${req.protocol}://${req.get('host')}/real`,
         });
 
-        const clientSecret = paymentIntent.client_secret;
-        res.render('checkout', { title: 'Checkout', clientSecret: clientSecret, cart: cart });
+        res.json({ id: session.id });
     } catch (error) {
-        console.error('Error creating PaymentIntent:', error);
-        res.status(500).json({ error: 'Error creating PaymentIntent' });
+        console.error(error);
+        res.status(500).send('Error processing payment');
     }
 });
 
 checkoutRouter.get('/confirmation', (req, res) => {
-    const purchaseId = Math.floor(Math.random() * 1000000); 
+    const purchaseId = Math.floor(Math.random() * 1000000);
     res.render('confirmation', { title: 'Confirmación de Compra', purchaseId: purchaseId });
 });
 

@@ -66,6 +66,12 @@ viewsRouter.get('/checkout', (req, res) => {
 viewsRouter.post('/create-checkout-session', async (req, res) => {
   const cart = req.session.cart || [];
 
+  // Verificar que todos los productos tengan los campos necesarios
+  const invalidItems = cart.filter(item => !item.name || !item.price || !item.imageUrl);
+  if (invalidItems.length > 0) {
+    return res.status(400).send('Some items in the cart are missing required fields.');
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -74,8 +80,10 @@ viewsRouter.post('/create-checkout-session', async (req, res) => {
           currency: 'usd',
           product_data: {
             name: item.name,
+            description: item.description || 'No description available',
+            images: [item.imageUrl],
           },
-          unit_amount: item.price * 100,
+          unit_amount: item.price * 100, // El precio debe estar en centavos
         },
         quantity: 1,
       })),
@@ -90,6 +98,7 @@ viewsRouter.post('/create-checkout-session', async (req, res) => {
     res.status(500).send('Error processing payment');
   }
 });
+
 
 viewsRouter.get('/confirmation', async (req, res) => {
   const session_id = req.query.session_id;
