@@ -113,11 +113,37 @@ class MongoManager {
 // Definimos una clase específica para gestionar órdenes
 class OrderManager extends MongoManager {
   constructor() {
-    super('orders'); // Nombre de la colección de órdenes
+    super('orders');
   }
 
   async getOrdersByUserId(userId) {
     return this.read({ userId: new ObjectId(userId) });
+  }
+
+  async createOrder(userId, products) {
+    const order = {
+      userId: new ObjectId(userId),
+      products,
+      createdAt: new Date(),
+      status: 'pending', 
+    };
+    return this.create(order);
+  }
+
+  async updateOrder(userId, orderId, products) {
+    const order = await this.readOne(orderId);
+    if (order && order.userId.toString() === userId.toString()) {
+      return this.update(orderId, { products, updatedAt: new Date() });
+    }
+    return null;
+  }
+
+  async deleteOrder(userId, orderId) {
+    const order = await this.readOne(orderId);
+    if (order && order.userId.toString() === userId.toString()) {
+      return this.delete(orderId);
+    }
+    return null;
   }
 }
 
