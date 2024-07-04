@@ -1,14 +1,9 @@
-import { Router } from "express";
-import { TicketController } from "../controllers/ticketController.js";
-import ensureAuthenticated from "../middlewares/ensureAuthenticated.js";
+import express from 'express';
+import passport from 'passport';
+import { calculateTotal } from '../controllers/ticketController.js';
 
-const ticketRouter = Router();
-const ticketController = new TicketController();
+const router = express.Router();
 
-// Endpoint para crear un ticket
-ticketRouter.post("/", ensureAuthenticated, ticketController.createTicket);
+router.get('/', passport.authenticate('jwt', { session: false }), calculateTotal);
 
-// Endpoint para obtener el total a pagar
-ticketRouter.get("/", ensureAuthenticated, ticketController.calculateTotal);
-
-export default ticketRouter;
+export default router;

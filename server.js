@@ -25,6 +25,7 @@ import paymentRoutes from './src/routers/paymentRoutes.js';
 import proxyRouter from './src/utils/proxyRouter.js';
 import Stripe from 'stripe';
 import ordersRouter from './src/routers/ordersRouter.js';
+import publicRouter from './src/routers/publicRouter.js'; 
 
 dotenv.config();
 
@@ -111,6 +112,7 @@ server.use('/checkout', checkoutRouter);
 server.use('/api/payments', paymentRoutes);
 server.use('/proxy', proxyRouter);
 server.use('/api/orders', ordersRouter);
+server.use('/public', publicRouter); 
 
 // Ruta para probar los logs (Implementación de logger)
 server.get('/api/loggers', (req, res) => {

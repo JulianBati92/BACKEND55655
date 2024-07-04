@@ -1,35 +1,13 @@
-import { Router } from "express";
-import passport from "passport";
-import propsUser from "../middlewares/propsUser.js";
-import { registerUser } from '../controllers/userController.js'; 
+import express from 'express';
+import passport from 'passport';
+import { registerUser, loginUser, resetPassword, getUserDetails, signoutUser } from '../controllers/authController.js';
 
-const router = Router();
+const router = express.Router();
 
-router.post("/register", propsUser, registerUser);
-
-router.post(
-    "/login",
-    passport.authenticate("local", {
-        successRedirect: "/",
-        failureRedirect: "/auth/login",
-        failureFlash: true,
-    })
-);
-
-// Google authentication routes
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-router.get(
-    "/google/callback",
-    passport.authenticate("google", { failureRedirect: "/auth/login" }),
-    (req, res) => {
-        res.redirect("/");
-    }
-);
-
-router.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect("/");
-});
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.post('/password', resetPassword);
+router.post('/user', passport.authenticate('jwt', { session: false }), getUserDetails);
+router.post('/signout', passport.authenticate('jwt', { session: false }), signoutUser);
 
 export default router;

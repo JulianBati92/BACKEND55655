@@ -1,121 +1,68 @@
 import Product from '../models/product.model.js';
-import CustomError from '../utils/errors/CustomError.js';
 
-// Obtener todos los productos
-const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const { category } = req.query;
+    const filter = category ? { category } : {};
+    const products = await Product.find(filter);
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Obtener producto por ID
-const getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.pid);
     if (!product) {
-      throw CustomError.new('notFound');
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Crear nuevo producto
-const createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
-    const newProduct = new Product(req.body);
-    await newProduct.save();
-    res.status(201).json(newProduct);
+    const product = new Product(req.body);
+    await product.save();
+    res.status(201).json(product);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Actualizar producto
-const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const product = await Product.findByIdAndUpdate(req.params.pid, req.body, { new: true });
     if (!product) {
-      throw CustomError.new('notFound');
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Eliminar producto
-const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findByIdAndDelete(req.params.pid);
     if (!product) {
-      throw CustomError.new('notFound');
+      return res.status(404).json({ message: 'Product not found' });
     }
-    res.json({ message: "Producto eliminado correctamente" });
+    res.json({ message: 'Product deleted successfully' });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Obtener productos del usuario premium
-const getMyProducts = async (req, res) => {
+export const getMyProducts = async (req, res) => {
   try {
-    const products = await Product.find({ owner_id: req.user._id });
+    const userId = req.user._id;
+    const products = await Product.find({ owner: userId });
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
-
-// Crear producto del usuario premium
-const createMyProduct = async (req, res) => {
-  try {
-    const newProduct = new Product({ ...req.body, owner_id: req.user._id });
-    await newProduct.save();
-    res.status(201).json(newProduct);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Actualizar producto del usuario premium
-const updateMyProduct = async (req, res) => {
-  try {
-    const product = await Product.findOneAndUpdate(
-      { _id: req.params.id, owner_id: req.user._id },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!product) {
-      throw CustomError.new('notFound');
-    }
-    res.json(product);
-  } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.message });
-  }
-};
-
-// Eliminar producto del usuario premium
-const deleteMyProduct = async (req, res) => {
-  try {
-    const product = await Product.findOneAndDelete({
-      _id: req.params.id,
-      owner_id: req.user._id,
-    });
-    if (!product) {
-      throw CustomError.new('notFound');
-    }
-    res.json({ message: "Producto eliminado correctamente" });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({ error: error.message });
-  }
-};
-
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getMyProducts, createMyProduct, updateMyProduct, deleteMyProduct };

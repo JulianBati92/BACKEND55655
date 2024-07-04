@@ -1,58 +1,61 @@
-const orderService = require('../services/orderService');
+import Order from '../models/order.model.js';
 
-class OrderController {
-  async createOrder(req, res) {
-    try {
-      // Lógica para crear una nueva orden
-      const order = await orderService.create(req.body);
-      res.status(201).json(order);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+// Crear una orden
+export const createOrder = async (req, res) => {
+  try {
+    const order = new Order(req.body);
+    await order.save();
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  async updateOrder(req, res) {
-    try {
-      // Lógica para actualizar una orden existente
-      const updatedOrder = await orderService.update(req.params.id, req.body);
-      res.json(updatedOrder);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+// Obtener una orden por ID
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  async deleteOrder(req, res) {
-    try {
-      // Lógica para eliminar una orden existente
-      await orderService.delete(req.params.id);
-      res.json({ message: 'Orden eliminada exitosamente' });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+// Actualizar una orden
+export const updateOrder = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  async getOrder(req, res) {
-    try {
-      // Lógica para obtener una orden por su ID
-      const order = await orderService.getById(req.params.id);
-      if (!order) {
-        return res.status(404).json({ message: 'Orden no encontrada' });
-      }
-      res.json(order);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+// Eliminar una orden
+export const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
+    res.json({ message: 'Order deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  async getAllOrders(req, res) {
-    try {
-      // Lógica para obtener todas las órdenes
-      const orders = await orderService.getAll();
-      res.json(orders);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+// Obtener todas las ordenes
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-}
-
-module.exports = new OrderController();
+};

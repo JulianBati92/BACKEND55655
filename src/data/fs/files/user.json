@@ -3,60 +3,70 @@
     "id": "560fce785bb0c56284fcefc3",
     "name": "Goku",
     "photo": "https://picsum.photos/200",
-    "email": "goku@example.com"
+    "email": "goku@example.com",
+    "password": "a1b2c3d4"
   },
   {
     "id": "3831c72a89eecb0ce8d55bad",
     "name": "Naruto",
     "photo": "https://picsum.photos/200",
-    "email": "naruto@example.com"
+    "email": "naruto@example.com",
+    "password": "e5f6g7h8"
   },
   {
     "id": "d8869bd39c36cf3be4401d1e",
     "name": "Luffy",
     "photo": "https://picsum.photos/200",
-    "email": "luffy@example.com"
+    "email": "luffy@example.com",
+    "password": "i9j0k1l2"
   },
   {
     "id": "9f530c17d694b4a418e3a677",
     "name": "Sakura",
     "photo": "https://picsum.photos/200",
-    "email": "sakura@example.com"
+    "email": "sakura@example.com",
+    "password": "m3n4o5p6"
   },
   {
     "id": "1dbb5e7888db6f3ec3310ef7",
     "name": "Ichigo",
     "photo": "https://picsum.photos/200",
-    "email": "ichigo@example.com"
+    "email": "ichigo@example.com",
+    "password": "q7r8s9t0"
   },
   {
     "id": "34eab6bf70ec15113bc74d47",
     "name": "Vegeta",
     "photo": "https://picsum.photos/200",
-    "email": "vegeta@example.com"
+    "email": "vegeta@example.com",
+    "password": "u1v2w3x4"
   },
   {
     "id": "70b6c381facd260a15e6f8f4",
     "name": "Sasuke",
     "photo": "https://picsum.photos/200",
-    "email": "sasuke@example.com"
+    "email": "sasuke@example.com",
+    "password": "y5z6a7b8"
   },
   {
     "id": "a37c251d9fcdbca73604f8de",
     "name": "Edward",
     "photo": "https://picsum.photos/200",
-    "email": "edward@example.com"
+    "email": "edward@example.com",
+    "password": "c9d0e1f2"
   },
   {
     "id": "13db948bb33e307d15249ac3",
     "name": "Bulma",
     "photo": "https://picsum.photos/200",
-    "email": "bulma@example.com"
+    "email": "bulma@example.com",
+    "password": "g3h4i5j6"
   },
   {
     "id": "16faaadf9a15eb4d064ed52d",
     "name": "Inuyasha",
     "photo": "https://picsum.photos/200",
-    "email": "inuyasha@example.com"
+    "email": "inuyasha@example.com",
+    "password": "k7l8m9n0"
   }
 ]

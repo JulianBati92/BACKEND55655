@@ -1,22 +1,14 @@
-import express from "express";
-import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getMyProducts, createMyProduct, updateMyProduct, deleteMyProduct, } from "../controllers/productController.js";
-import { isAuthenticated, isAdmin, isPremiumUser, } from "../middlewares/authMiddleware.js";
+import express from 'express';
+import passport from 'passport';
+import { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getMyProducts, } from '../controllers/productController.js';
 
-const productRouter = express.Router();
+const router = express.Router();
 
-// Rutas abiertas
-productRouter.get("/", getAllProducts);
-productRouter.get("/:id", getProductById);
+router.get('/', getAllProducts);
+router.get('/:pid', getProductById);
+router.post('/', passport.authenticate('jwt', { session: false }), createProduct);
+router.put('/:pid', passport.authenticate('jwt', { session: false }), updateProduct);
+router.delete('/:pid', passport.authenticate('jwt', { session: false }), deleteProduct);
+router.get('/me', passport.authenticate('jwt', { session: false }), getMyProducts);
 
-// Rutas para administradores
-productRouter.post("/", isAuthenticated, isAdmin, createProduct);
-productRouter.put("/:id", isAuthenticated, isAdmin, updateProduct);
-productRouter.delete("/:id", isAuthenticated, isAdmin, deleteProduct);
-
-// Rutas para usuarios premium
-productRouter.get("/me", isAuthenticated, isPremiumUser, getMyProducts);
-productRouter.post("/me", isAuthenticated, isPremiumUser, createMyProduct);
-productRouter.put("/me/:id", isAuthenticated, isPremiumUser, updateMyProduct);
-productRouter.delete( "/me/:id", isAuthenticated, isPremiumUser, deleteMyProduct);
-
-export default productRouter;
+export default router;
